@@ -52,5 +52,4 @@ public class UserEntity extends BaseEntity{
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
     private List<OrderEntity> orderEntities = new ArrayList<>();
-
 }
