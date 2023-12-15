@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
@@ -33,7 +32,7 @@ public class UserSignUpRequest {
     @NotBlank(message = "Location required")
     String address;
 
-    @Size(min = 8, max = 50)
+    @Size(min = 5, max = 50)
     @Email(message = "E-mail must be valid")
     @NotBlank(message = "E-mail required")
     String email;
@@ -41,5 +40,5 @@ public class UserSignUpRequest {
     @NotNull
     Gender gender;
 
-    LocalDate dateOfBirth;
+    String dob;
 }
