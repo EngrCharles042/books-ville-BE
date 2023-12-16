@@ -4,6 +4,7 @@ import BooksVille.entities.enums.Roles;
 import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.events.publisher.EventPublisher;
 import BooksVille.infrastructure.exceptions.ApplicationException;
+import BooksVille.infrastructure.security.JWTGenerator;
 import BooksVille.payload.request.authRequest.UserSignUpRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.authResponse.UserSignUpResponse;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -25,6 +28,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EventPublisher publisher;
     private final HttpServletRequest request;
+    private final JWTGenerator jwtGenerator;
+    private final UserEntityRepository userEntityRepository;
 
     @Override
     public ResponseEntity<ApiResponse<UserSignUpResponse>> registerUser(UserSignUpRequest userSignUpRequest) {
@@ -90,5 +95,40 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>("Account created successfully", signupResponse)
         );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> verifyToken(String receivedToken) {
+        if(!jwtGenerator.validateToken(receivedToken)){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>("Token expired, do request for new token", "expired"));
+        }
+
+        String email = jwtGenerator.getEmailFromJWT(receivedToken);
+
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
+
+        if (userEntityOptional.isPresent()){
+
+            UserEntity userEntity = userEntityOptional.get();
+
+            if (userEntity.isVerified()){
+                return ResponseEntity
+                        .status(HttpStatus.ALREADY_REPORTED)
+                        .body(new ApiResponse<>("This account has been verified, do proceed to  login", "account verified"));
+            }
+
+            userEntity.setVerified(true);
+            userEntityRepository.save(userEntity);
+
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(new ApiResponse<>("Verification Successful", "valid"));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponse<>("Invalid Token", "invalid"));
     }
 }
