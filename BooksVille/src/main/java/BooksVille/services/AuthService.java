@@ -8,4 +8,5 @@ import org.springframework.http.ResponseEntity;
 public interface AuthService {
     ResponseEntity<ApiResponse<UserSignUpResponse>> registerUser(UserSignUpRequest userSignUpRequest);
     ResponseEntity<ApiResponse<UserSignUpResponse>> registerAdmin(UserSignUpRequest userSignUpRequest);
+    ResponseEntity<ApiResponse<String>> verifyToken(String receivedToken);
 }
