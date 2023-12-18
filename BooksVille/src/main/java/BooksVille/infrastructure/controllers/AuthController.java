@@ -37,12 +37,22 @@ public class AuthController {
 
     @PostMapping("/admin-forgot-password")
     public ResponseEntity<ApiResponse<String>> adminForgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
-        return authService.adminForgotPassword(forgotPasswordRequest.getEmail());
+        return authService.forgotPassword(forgotPasswordRequest.getEmail());
+    }
+
+    @PostMapping("/user-forgot-password")
+    public ResponseEntity<ApiResponse<String>> userForgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        return authService.forgotPassword(forgotPasswordRequest.getEmail());
     }
 
     @PostMapping(value = "/admin-reset-forgot-password")
     public ResponseEntity<ApiResponse<String>> adminResetForgotPassword(@Valid @RequestBody ForgotPasswordResetRequest forgotPasswordResetRequest) {
-        return authService.adminResetForgotPassword(forgotPasswordResetRequest);
+        return authService.resetForgotPassword(forgotPasswordResetRequest);
+    }
+
+    @PostMapping(value = "/user-reset-forgot-password")
+    public ResponseEntity<ApiResponse<String>> userResetForgotPassword(@Valid @RequestBody ForgotPasswordResetRequest forgotPasswordResetRequest) {
+        return authService.resetForgotPassword(forgotPasswordResetRequest);
     }
 
     @PostMapping("/login")
