@@ -12,4 +12,5 @@ public interface AuthService {
     ResponseEntity<ApiResponse<UserSignUpResponse>> registerAdmin(UserSignUpRequest userSignUpRequest);
     ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest);
     void logout();
+    ResponseEntity<ApiResponse<String>> verifyToken(String receivedToken);
 }

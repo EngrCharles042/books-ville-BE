@@ -31,18 +31,17 @@ import java.util.Optional;
 @Service
 public class AuthServiceImpl implements AuthService {
     private final ModelMapper modelMapper;
-    private final UserEntityRepository userRepository;
+    private final UserEntityRepository userEntityRepository;
     private final PasswordEncoder passwordEncoder;
     private final EventPublisher publisher;
     private final HttpServletRequest request;
     private final AuthenticationManager authenticationManager;
     private final JWTGenerator jwtGenerator;
 
-
     @Override
     public ResponseEntity<ApiResponse<UserSignUpResponse>> registerUser(UserSignUpRequest userSignUpRequest) {
         // Checks if a user's email is already in the database
-        boolean isPresent = userRepository.existsByEmail(userSignUpRequest.getEmail());
+        boolean isPresent = userEntityRepository.existsByEmail(userSignUpRequest.getEmail());
 
         // Throws and error if the email already exists
         if (isPresent) {
@@ -59,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
         newUser.setPassword(passwordEncoder.encode(userSignUpRequest.getPassword()));
 
         // Save the user to the database
-        UserEntity savedUser = userRepository.save(newUser);
+        UserEntity savedUser = userEntityRepository.save(newUser);
 
         // Publish and event to verify Email
         publisher.completeRegistrationEventPublisher(savedUser.getEmail(), savedUser.getFirstName(), request);
@@ -75,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<ApiResponse<UserSignUpResponse>> registerAdmin(UserSignUpRequest userSignUpRequest) {
         // Checks if a user's email is already in the database
-        boolean isPresent = userRepository.existsByEmail(userSignUpRequest.getEmail());
+        boolean isPresent = userEntityRepository.existsByEmail(userSignUpRequest.getEmail());
 
         // Throws and error if the email already exists
         if (isPresent) {
@@ -92,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
         newAdmin.setPassword(passwordEncoder.encode(userSignUpRequest.getPassword()));
 
         // Save the user to the database
-        UserEntity savedAdmin = userRepository.save(newAdmin);
+        UserEntity savedAdmin = userEntityRepository.save(newAdmin);
 
         // Publish and event to verify Email
         publisher.completeRegistrationEventPublisher(savedAdmin.getEmail(), savedAdmin.getFirstName(), request);
@@ -107,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest) {
-        Optional<UserEntity> userEntityOptional = userRepository.findByEmail(loginRequest.getEmail());
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(loginRequest.getEmail());
 
 
         if (userEntityOptional.isPresent() && !userEntityOptional.get().isVerified()) {
@@ -160,5 +159,39 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout() {
         SecurityContextHolder.clearContext();
+    }
+
+    public ResponseEntity<ApiResponse<String>> verifyToken(String receivedToken) {
+        if(!jwtGenerator.validateToken(receivedToken)){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>("Token expired, do request for new token", "expired"));
+        }
+
+        String email = jwtGenerator.getEmailFromJWT(receivedToken);
+
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
+
+        if (userEntityOptional.isPresent()){
+
+            UserEntity userEntity = userEntityOptional.get();
+
+            if (userEntity.isVerified()){
+                return ResponseEntity
+                        .status(HttpStatus.ALREADY_REPORTED)
+                        .body(new ApiResponse<>("This account has been verified, do proceed to  login", "account verified"));
+            }
+
+            userEntity.setVerified(true);
+            userEntityRepository.save(userEntity);
+
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(new ApiResponse<>("Verification Successful", "valid"));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponse<>("Invalid Token", "invalid"));
     }
 }
