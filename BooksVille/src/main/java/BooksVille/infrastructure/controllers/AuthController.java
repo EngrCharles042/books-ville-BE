@@ -1,16 +1,15 @@
 package BooksVille.infrastructure.controllers;
 
+import BooksVille.payload.request.authRequest.LoginRequest;
 import BooksVille.payload.request.authRequest.UserSignUpRequest;
 import BooksVille.payload.response.ApiResponse;
+import BooksVille.payload.response.authResponse.JwtAuthResponse;
 import BooksVille.payload.response.authResponse.UserSignUpResponse;
 import BooksVille.services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +25,14 @@ public class AuthController {
     @PostMapping("/register-admin")
     public ResponseEntity<ApiResponse<UserSignUpResponse>> registerAdmin(@Valid @RequestBody UserSignUpRequest userSignUpRequest) {
         return authService.registerAdmin(userSignUpRequest);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<JwtAuthResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
+        return authService.login(loginRequest);
+    }
+    @GetMapping("/logout")
+    private ResponseEntity<ApiResponse<String>> logout(){
+        authService.logout();
+        return ResponseEntity.ok(new ApiResponse<>("Logout Successfully"));
     }
 }

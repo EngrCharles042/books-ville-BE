@@ -4,18 +4,28 @@ import BooksVille.entities.enums.Roles;
 import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.events.publisher.EventPublisher;
 import BooksVille.infrastructure.exceptions.ApplicationException;
+import BooksVille.infrastructure.security.JWTGenerator;
+import BooksVille.payload.request.authRequest.LoginRequest;
 import BooksVille.payload.request.authRequest.UserSignUpRequest;
 import BooksVille.payload.response.ApiResponse;
+import BooksVille.payload.response.authResponse.JwtAuthResponse;
 import BooksVille.payload.response.authResponse.UserSignUpResponse;
 import BooksVille.repositories.UserEntityRepository;
 import BooksVille.services.AuthService;
+import BooksVille.utils.SecurityConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +35,9 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EventPublisher publisher;
     private final HttpServletRequest request;
+    private final AuthenticationManager authenticationManager;
+    private final JWTGenerator jwtGenerator;
+
 
     @Override
     public ResponseEntity<ApiResponse<UserSignUpResponse>> registerUser(UserSignUpRequest userSignUpRequest) {
@@ -90,5 +103,62 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>("Account created successfully", signupResponse)
         );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest) {
+        Optional<UserEntity> userEntityOptional = userRepository.findByEmail(loginRequest.getEmail());
+
+
+        if (userEntityOptional.isPresent() && !userEntityOptional.get().isVerified()) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ApiResponse<>("notVerified")
+            );
+        }
+
+        // Authentication manager to authenticate user
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
+        );
+
+        // Saving authentication in security context so user won't have to login everytime the network is called
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(authentication);
+
+        // Generate jwt token
+        String token = jwtGenerator.generateToken(authentication, SecurityConstants.JWT_EXPIRATION);
+
+        // Generate jwt refresh token
+        String refreshToken = jwtGenerator.generateToken(authentication, SecurityConstants.JWT_REFRESH_TOKEN_EXPIRATION);
+
+        UserEntity userEntity = userEntityOptional.get();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(
+                        new ApiResponse<>(
+                                "Login Successful",
+                                JwtAuthResponse.builder()
+                                        .accessToken(token)
+                                        .refreshToken(refreshToken)
+                                        .tokenType("Bearer")
+                                        .id(userEntity.getId())
+                                        .email(userEntity.getEmail())
+                                        .firstName(userEntity.getFirstName())
+                                        .lastName(userEntity.getLastName())
+                                        .gender(userEntity.getGender())
+                                        .role(userEntity.getRoles())
+                                        .build()
+                        )
+                );
+        }
+
+    @Override
+    public void logout() {
+        SecurityContextHolder.clearContext();
     }
 }

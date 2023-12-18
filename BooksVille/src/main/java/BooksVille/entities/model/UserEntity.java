@@ -39,7 +39,7 @@ public class UserEntity extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Roles roles;
 
-    private Boolean isVerified = false;
+    private boolean isVerified = false;
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
     private List<OrderEntity> orderEntities = new ArrayList<>();
