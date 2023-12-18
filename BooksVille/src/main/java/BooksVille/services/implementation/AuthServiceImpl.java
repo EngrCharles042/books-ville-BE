@@ -107,7 +107,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<String>> adminForgotPassword(String email) {
+    public ResponseEntity<ApiResponse<String>> forgotPassword(String email) {
         if (!userEntityRepository.existsByEmail(email)) {
             throw new ApplicationException("Invalid email provided, please check and try again.");
         }
@@ -117,7 +117,8 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.ok(new ApiResponse<>("A link has been sent to your email to reset your password"));
     }
 
-    public ResponseEntity<ApiResponse<String>> adminResetForgotPassword(ForgotPasswordResetRequest forgotPasswordResetRequest) {
+
+    public ResponseEntity<ApiResponse<String>> resetForgotPassword(ForgotPasswordResetRequest forgotPasswordResetRequest) {
         if (!jwtGenerator.validateToken(forgotPasswordResetRequest.getToken())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
