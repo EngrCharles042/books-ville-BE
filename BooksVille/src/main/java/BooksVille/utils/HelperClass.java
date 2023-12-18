@@ -137,7 +137,6 @@ public class HelperClass {
                 + "</body>";
     }
 
-
     public String extractFirstName(String email) {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(email);
 

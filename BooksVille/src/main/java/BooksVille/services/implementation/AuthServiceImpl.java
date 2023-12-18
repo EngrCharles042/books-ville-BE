@@ -4,6 +4,8 @@ import BooksVille.entities.enums.Roles;
 import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.events.publisher.EventPublisher;
 import BooksVille.infrastructure.exceptions.ApplicationException;
+import BooksVille.infrastructure.security.JWTGenerator;
+import BooksVille.payload.request.authRequest.ForgotPasswordResetRequest;
 import BooksVille.payload.request.authRequest.UserSignUpRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.authResponse.UserSignUpResponse;
@@ -17,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -25,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EventPublisher publisher;
     private final HttpServletRequest request;
+    private final JWTGenerator jwtGenerator;
 
     @Override
     public ResponseEntity<ApiResponse<UserSignUpResponse>> registerUser(UserSignUpRequest userSignUpRequest) {
@@ -90,5 +95,45 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>("Account created successfully", signupResponse)
         );
+
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> adminForgotPassword(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            throw new ApplicationException("Invalid email provided, please check and try again.");
+        }
+
+        publisher.forgotPasswordEventPublisher(email, request);
+
+        return ResponseEntity.ok(new ApiResponse<>("A link has been sent to your email to reset your password"));
+    }
+
+    public ResponseEntity<ApiResponse<String>> adminResetForgotPassword(ForgotPasswordResetRequest forgotPasswordResetRequest) {
+        if (!jwtGenerator.validateToken(forgotPasswordResetRequest.getToken())) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>("Token expired, please request for a new one"));
+        }
+
+        String email = jwtGenerator.getEmailFromJWT(forgotPasswordResetRequest.getToken());
+
+        Optional<UserEntity> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+
+            user.setPassword(passwordEncoder.encode(forgotPasswordResetRequest.getNewPassword()));
+
+            userRepository.save(user);
+
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(new ApiResponse<>("Password Changed Successfully"));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponse<>("Invalid"));
     }
 }
