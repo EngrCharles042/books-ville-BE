@@ -1,5 +1,7 @@
 package BooksVille.infrastructure.controllers;
 
+import BooksVille.payload.request.authRequest.ForgotPasswordRequest;
+import BooksVille.payload.request.authRequest.ForgotPasswordResetRequest;
 import BooksVille.payload.request.authRequest.LoginRequest;
 import BooksVille.infrastructure.security.JWTGenerator;
 import BooksVille.payload.request.authRequest.UserSignUpRequest;
@@ -31,6 +33,16 @@ public class AuthController {
     @PostMapping("/register-admin")
     public ResponseEntity<ApiResponse<UserSignUpResponse>> registerAdmin(@Valid @RequestBody UserSignUpRequest userSignUpRequest) {
         return authService.registerAdmin(userSignUpRequest);
+    }
+
+    @PostMapping("/admin-forgot-password")
+    public ResponseEntity<ApiResponse<String>> adminForgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        return authService.adminForgotPassword(forgotPasswordRequest.getEmail());
+    }
+
+    @PostMapping(value = "/admin-reset-forgot-password")
+    public ResponseEntity<ApiResponse<String>> adminResetForgotPassword(@Valid @RequestBody ForgotPasswordResetRequest forgotPasswordResetRequest) {
+        return authService.adminResetForgotPassword(forgotPasswordResetRequest);
     }
 
     @PostMapping("/login")
