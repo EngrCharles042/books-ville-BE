@@ -25,20 +25,16 @@ public class UserSignUpRequest {
     @NotBlank(message = "password must not be blank")
     String password;
 
+    @Size(min = 6, max = 65, message = "confirm password must be at least 6 characters")
+    @NotBlank(message = "confirm password must not be blank")
+    String confirmPassword;
+
     @Size(min = 6, max = 15, message = "phone number must be at least 6 characters")
     @NotBlank(message = "Please input a valid number")
     String phoneNumber;
-
-    @NotBlank(message = "Location required")
-    String address;
 
     @Size(min = 5, max = 50)
     @Email(message = "E-mail must be valid")
     @NotBlank(message = "E-mail required")
     String email;
-
-    @NotNull
-    Gender gender;
-
-    String dob;
 }

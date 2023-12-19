@@ -149,7 +149,6 @@ public class AuthServiceImpl implements AuthService {
                                         .email(userEntity.getEmail())
                                         .firstName(userEntity.getFirstName())
                                         .lastName(userEntity.getLastName())
-                                        .gender(userEntity.getGender())
                                         .role(userEntity.getRoles())
                                         .build()
                         )
