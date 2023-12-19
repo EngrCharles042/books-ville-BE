@@ -29,12 +29,7 @@ public class UserEntity extends BaseEntity{
 
     private String phoneNumber;
 
-    private String address;
-
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-
-    private String dob;
+    private String profilePicture;
 
     @Enumerated(EnumType.STRING)
     private Roles roles;
