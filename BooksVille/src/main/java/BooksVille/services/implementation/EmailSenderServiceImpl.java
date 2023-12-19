@@ -1,11 +1,16 @@
 package BooksVille.services.implementation;
 
+import BooksVille.entities.model.UserEntity;
+import BooksVille.infrastructure.events.event.ForgotPasswordEvent;
+import BooksVille.repositories.UserEntityRepository;
 import BooksVille.services.EmailSenderService;
 import BooksVille.utils.HelperClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -16,6 +21,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
     @Value("${spring.mail.username}")
     private String senderMail;
+    private final UserEntityRepository userEntityRepository;
 
     @Override
     public void sendNotificationEmail(String url,
@@ -58,5 +64,33 @@ public class EmailSenderServiceImpl implements EmailSenderService {
                 subject,
                 description
             );
+    }
+
+    @Override
+    public void sendForgotPasswordEmailVerification(String url, ForgotPasswordEvent event) {
+        Optional<UserEntity> optionalUser = userEntityRepository.findByEmail(event.getEmail());
+
+
+        String action = "Change Password";
+        String serviceProvider = "BooksVille Registration Portal Service";
+        String subject = "Email Verification";
+        String description = "Please follow the link below to change your password.";
+
+        if (optionalUser.isPresent()) {
+            UserEntity user = optionalUser.get();
+
+
+            helperClass.sendEmail(
+                    user.getFirstName(),
+                    url,
+                    mailSender,
+                    senderMail,
+                    event.getEmail(),
+                    action,
+                    serviceProvider,
+                    subject,
+                    description
+            );
+        }
     }
 }
