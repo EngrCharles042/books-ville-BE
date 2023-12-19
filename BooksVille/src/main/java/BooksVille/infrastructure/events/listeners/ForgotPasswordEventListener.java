@@ -24,7 +24,7 @@ public class ForgotPasswordEventListener implements ApplicationListener<ForgotPa
         String verificationToken = tokenProvider.generateSignUpVerificationToken(event.getEmail(), SecurityConstants.JWT_REFRESH_TOKEN_EXPIRATION);
 
         // Build the verification url to be sent to the user
-        String url = "http://127.0.0.1:1123/reset-forgot-password?token=" + verificationToken;
+        String url = "http://127.0.0.1:2024/reset-password?token=" + verificationToken + "&email=" + event.getEmail();
 
         // Send the email to the user
         emailSenderService.sendForgotPasswordEmailVerification(url, event);
