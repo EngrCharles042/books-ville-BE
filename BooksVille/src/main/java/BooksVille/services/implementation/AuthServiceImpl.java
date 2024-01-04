@@ -165,7 +165,7 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
-        // Saving authentication in security context so user won't have to login everytime the network is called
+        // Saving authentication in security context so user won't have to log in  everytime the network is called
         SecurityContextHolder
                 .getContext()
                 .setAuthentication(authentication);
