@@ -9,9 +9,6 @@ import lombok.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-/**
- * DTO for {@link BooksVille.entities.model.BookEntity}
- */
 @Builder
 @Getter
 @Setter
@@ -19,7 +16,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class BookEntityRequest {
 
-    @Size(min = 2, max = 40, message = "Author's name is too long or short")
+    @Size(min = 2, max = 100, message = "Author's name is too long or short")
     @NotBlank(message = "Name cannot be blank")
     private  String author;
 
@@ -27,6 +24,7 @@ public class BookEntityRequest {
     @Size(min = 10, max = 100)
     private  String bookTitle;
 
+    @NotNull(message = "Genre is required")
     private  Genre genre;
 
     @NotBlank(message = "Book description is required.")

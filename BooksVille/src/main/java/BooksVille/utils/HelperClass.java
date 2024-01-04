@@ -128,7 +128,7 @@ public class HelperClass {
                 + "<hr style='color: black'>"
                 + "<p style='font-family: Academy Engraved LET; font-size: 30px'> Hi, " + firstName + " </p>"
                 + "<p style='font-family: Cochin; margin-bottom: 1.5rem'> " + description + " </p>"
-                + "<a href='http://127.0.0.1:2024/login' style='font-family: Cochin; width: 35vw; height: 4rem; border-radius: 1rem; border: 1px solid #27AE60; margin-top: 1rem; margin-bottom: 4rem; opacity: 0.8; background-color: rgb(36,36,138); color: white; font-size: 18px; cursor: pointer; padding: 1rem 2rem; text-align: center; text-decoration: none' />"
+                + "<a href='http://127.0.0.1:2024/login' style='font-family: Cochin; width: 35vw; height: 4rem; border-radius: 1rem; border: 1px solid #27AE60; margin-top: 1rem; margin-bottom: 4rem; opacity: 0.8; background-color: #27AE60; color: white; font-size: 18px; cursor: pointer; padding: 1rem 2rem; text-align: center; text-decoration: none' />"
                 + buttonName
                 + "</a>"
                 + "<p style='font-family: Cochin; margin-top: 1.5rem'> &copy; &nbsp;" + serviceProvider + " </p>"
