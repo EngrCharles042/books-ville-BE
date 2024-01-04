@@ -1,9 +1,7 @@
 package BooksVille.entities.model;
 
 import BooksVille.entities.enums.Genre;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -23,6 +21,7 @@ public class BookEntity extends BaseEntity{
     private String bookTitle;
 
     @Column(length = 35)
+    @Enumerated(EnumType.STRING)
     private Genre genre;
 
     @Column(nullable = false, length = 2000)
