@@ -27,9 +27,6 @@ public class BookEntity extends BaseEntity{
     @Column(nullable = false, length = 2000)
     private String description;
 
-    @Column(nullable = false, length = 200)
-    private String shortDescription;
-
     @Column(nullable = false, length = 50)
     private BigDecimal price;
 }
