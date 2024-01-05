@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -23,4 +25,10 @@ public class AdminController {
     }
 
 
+        return adminService.getAllBooks(pageNo, pageSize, sortBy, sortDir);
+    }
+    @GetMapping("/search/title-or-author-or-price-or-genre")
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> bookSearchWithKeyword (@RequestParam("query")String query) {
+        return adminService.searchBooks(query);
+  
 }
