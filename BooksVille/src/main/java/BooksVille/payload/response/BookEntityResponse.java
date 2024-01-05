@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * DTO for {@link BooksVille.entities.model.BookEntity}
@@ -15,10 +16,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class BookEntityResponse {
-    private  Long id;
-    private  String author;
-    private  String bookTitle;
-    private  Genre genre;
-    private  String shortDescription;
-    private  BigDecimal price;
+    private Long id;
+    private LocalDateTime dateCreated;
+    private String author;
+    private String bookTitle;
+    private Genre genre;
+    private String shortDescription;
+    private BigDecimal price;
 }

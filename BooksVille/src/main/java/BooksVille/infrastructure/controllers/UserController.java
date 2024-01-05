@@ -14,11 +14,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final BookService bookService;
 
-    @GetMapping("/get-book")
-    public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@RequestParam Long id) {
-    return bookService.findById(id);
-
-    }
 }

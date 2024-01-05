@@ -148,14 +148,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest) {
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(loginRequest.getEmail());
-
-
-        if (userEntityOptional.isPresent() && !userEntityOptional.get().isVerified()) {
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ApiResponse<>("notVerified")
-            );
-        }
 
         // Authentication manager to authenticate user
         Authentication authentication = authenticationManager.authenticate(
@@ -165,7 +157,16 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
-        // Saving authentication in security context so user won't have to log in  everytime the network is called
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(loginRequest.getEmail());
+
+
+        if (userEntityOptional.isPresent() && !userEntityOptional.get().isVerified()) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ApiResponse<>("notVerified")
+            );
+        }
+
+        // Saving authentication in security context so user won't have to login everytime the network is called
         SecurityContextHolder
                 .getContext()
                 .setAuthentication(authentication);

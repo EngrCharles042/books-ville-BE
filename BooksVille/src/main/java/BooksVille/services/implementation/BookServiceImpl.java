@@ -4,14 +4,12 @@ import BooksVille.entities.model.BookEntity;
 import BooksVille.infrastructure.exceptions.ApplicationException;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
+import BooksVille.payload.response.BookResponsePage;
 import BooksVille.repositories.BookRepository;
 import BooksVille.services.BookService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +38,38 @@ public class BookServiceImpl implements BookService {
                  )
          );
 
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<BookResponsePage>> getAllBooks(int pageNo, int pageSize, String sortBy, String sortDir) {
+        // Sort condition
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<BookEntity> bookEntitiesPage = bookRepository.findAll(pageable);
+
+        List<BookEntity> bookEntities = bookEntitiesPage.getContent();
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(bookEntityResponse -> modelMapper.map(bookEntityResponse, BookEntityResponse.class))
+                .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "Success",
+                        BookResponsePage.builder()
+                                .content(bookEntityResponses)
+                                .pageNo(bookEntitiesPage.getNumber())
+                                .pageSize(bookEntitiesPage.getSize())
+                                .totalElements(bookEntitiesPage.getTotalElements())
+                                .totalPages(bookEntitiesPage.getTotalPages())
+                                .last(bookEntitiesPage.isLast())
+                                .build()
+                )
+        );
     }
 
 
