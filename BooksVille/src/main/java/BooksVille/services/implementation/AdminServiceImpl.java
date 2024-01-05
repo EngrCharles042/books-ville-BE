@@ -47,35 +47,6 @@ public class AdminServiceImpl implements AdminService {
                 );
     }
 
-    @Override
-    public ResponseEntity<ApiResponse<BookResponsePage>> getAllBooks(int pageNo, int pageSize, String sortBy, String sortDir) {
-        // Sort condition
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
 
-        // Create Pageable instance
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<BookEntity> bookEntitiesPage = bookRepository.findAll(pageable);
-
-        List<BookEntity> bookEntities = bookEntitiesPage.getContent();
-
-        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
-                .map(bookEntityResponse -> modelMapper.map(bookEntityResponse, BookEntityResponse.class))
-                .toList();
-
-        return ResponseEntity.ok(
-                new ApiResponse<>(
-                        "Success",
-                        BookResponsePage.builder()
-                                .content(bookEntityResponses)
-                                .pageNo(bookEntitiesPage.getNumber())
-                                .pageSize(bookEntitiesPage.getSize())
-                                .totalElements(bookEntitiesPage.getTotalElements())
-                                .totalPages(bookEntitiesPage.getTotalPages())
-                                .last(bookEntitiesPage.isLast())
-                                .build()
-                )
-        );
-    }
 }
