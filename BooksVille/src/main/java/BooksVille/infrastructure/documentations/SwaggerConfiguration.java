@@ -18,7 +18,7 @@ public class SwaggerConfiguration {
                         addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes
                         ("Bearer Authentication", createAPIKeyScheme()))
-                .info(new Info().title("Swift Select")
+                .info(new Info().title("BooksVille")
                         .description("Documentation for BooksVille SpringBoot application REST APIs")
                         .version("v1.0").contact(new Contact().name("BooksVille Team A")
                                 .email("ng.booksville@gmail.com").url("https://github.com/decadevs/Books-Ville-Managed-Internship-Sqd17-BE"))
