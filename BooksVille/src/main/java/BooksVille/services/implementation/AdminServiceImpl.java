@@ -10,7 +10,10 @@ import BooksVille.repositories.BookRepository;
 import BooksVille.services.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -77,5 +80,23 @@ public class AdminServiceImpl implements AdminService {
                                 .build()
                 )
         );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> searchBooks(String query) {
+        List<BookEntity> bookSearch = bookRepository.searchBook(query);
+
+        List<BookEntityResponse>searchResponses = bookSearch.stream()
+                .map(bookEntity -> {
+                    BookEntityResponse bookEntityResponse = modelMapper.map(bookEntity, BookEntityResponse.class);
+                    bookEntityResponse.setBookTitle(bookEntity.getBookTitle());
+                    bookEntityResponse.setAuthor(bookEntity.getAuthor());
+                    bookEntityResponse.setGenre(bookEntity.getGenre());
+                    bookEntityResponse.setPrice(bookEntity.getPrice());
+
+                    return bookEntityResponse;
+                })
+                .toList();
+        return ResponseEntity.ok(new ApiResponse<>("search complete",searchResponses));
     }
 }

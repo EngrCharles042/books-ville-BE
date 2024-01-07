@@ -1,27 +1,27 @@
 package BooksVille.infrastructure.controllers;
 
-import BooksVille.payload.request.BookEntityRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
-import BooksVille.services.AdminService;
+import BooksVille.services.BookService;
 import BooksVille.utils.AppConstants;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin")
 @RequiredArgsConstructor
-public class AdminController {
-    private final AdminService adminService;
+@RequestMapping("/book")
+public class BookController {
+    private final BookService bookService;
 
-    @PostMapping("/add-book")
-    public ResponseEntity<ApiResponse<BookEntityResponse>> addBook(@Valid @RequestBody BookEntityRequest bookEntityRequest) {
-        return adminService.addBook(bookEntityRequest);
+    @GetMapping("/get-book")
+    public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@RequestParam Long id) {
+        return bookService.findById(id);
+
     }
 
     @GetMapping("/books")
@@ -31,10 +31,6 @@ public class AdminController {
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
 
-        return adminService.getAllBooks(pageNo, pageSize, sortBy, sortDir);
-    }
-    @GetMapping("/search/title-or-author-or-price-or-genre")
-    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> bookSearchWithKeyword (@RequestParam("query")String query) {
-        return adminService.searchBooks(query);
+        return bookService.getAllBooks(pageNo, pageSize, sortBy, sortDir);
     }
 }
