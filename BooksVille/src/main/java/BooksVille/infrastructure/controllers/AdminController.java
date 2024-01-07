@@ -24,11 +24,17 @@ public class AdminController {
         return adminService.addBook(bookEntityRequest);
     }
 
+    @GetMapping("/books")
+    public ResponseEntity<ApiResponse<BookResponsePage>> getAllBooks(
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
 
         return adminService.getAllBooks(pageNo, pageSize, sortBy, sortDir);
     }
     @GetMapping("/search/title-or-author-or-price-or-genre")
     public ResponseEntity<ApiResponse<List<BookEntityResponse>>> bookSearchWithKeyword (@RequestParam("query")String query) {
         return adminService.searchBooks(query);
-  
+    }
 }

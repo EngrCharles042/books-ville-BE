@@ -10,7 +10,10 @@ import BooksVille.repositories.BookRepository;
 import BooksVille.services.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -47,6 +50,18 @@ public class AdminServiceImpl implements AdminService {
                 );
     }
 
+    @Override
+    public ResponseEntity<ApiResponse<BookResponsePage>> getAllBooks(int pageNo, int pageSize, String sortBy, String sortDir) {
+        // Sort condition
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<BookEntity> bookEntitiesPage = bookRepository.findAll(pageable);
+
+        List<BookEntity> bookEntities = bookEntitiesPage.getContent();
 
         List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
                 .map(bookEntityResponse -> modelMapper.map(bookEntityResponse, BookEntityResponse.class))
