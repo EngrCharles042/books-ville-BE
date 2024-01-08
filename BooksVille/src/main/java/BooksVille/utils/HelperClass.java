@@ -5,6 +5,7 @@ import BooksVille.infrastructure.exceptions.ApplicationException;
 import BooksVille.repositories.UserEntityRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
@@ -12,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
@@ -145,5 +147,18 @@ public class HelperClass {
         }
 
         return "";
+    }
+
+    public String getTokenFromHttpRequest(HttpServletRequest request) {
+        // Get the bearer token from the http request
+        String bearerToken = request.getHeader("Authorization");
+
+        // Extract only the Token excluding the prefix "Bearer "
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            System.out.println(bearerToken);
+            return bearerToken.substring(7);
+        }
+
+        return null;
     }
 }

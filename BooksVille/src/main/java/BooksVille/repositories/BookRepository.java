@@ -23,4 +23,6 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
             "OR LOWER(price) LIKE LOWER(CONCAT('%', :query, '%'))",
             nativeQuery = true)
     List<BookEntity> searchBook(@Param("query") String query);
+
+    Optional<BookEntity> findBookEntitiesById(Long bookEntityId);
 }
