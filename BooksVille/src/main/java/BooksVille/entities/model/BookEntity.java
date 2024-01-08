@@ -14,19 +14,18 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "book_entity")
 public class BookEntity extends BaseEntity{
-    @Column(nullable = false,length = 45)
     private String author;
 
-    @Column(length = 35)
     private String bookTitle;
 
-    @Column(length = 35)
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
-    @Column(nullable = false, length = 2000)
     private String description;
 
-    @Column(nullable = false, length = 50)
+    private String shortDescription;
+
     private BigDecimal price;
+
+    private Boolean hidden = false;
 }

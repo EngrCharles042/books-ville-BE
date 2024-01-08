@@ -1,5 +1,6 @@
 package BooksVille.infrastructure.controllers;
 
+import BooksVille.payload.request.BookEntityRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
@@ -7,10 +8,7 @@ import BooksVille.services.BookService;
 import BooksVille.utils.AppConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +30,21 @@ public class BookController {
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
 
         return bookService.getAllBooks(pageNo, pageSize, sortBy, sortDir);
+    }
+
+    @PutMapping("/edit/{bookEntityId}")
+    public ResponseEntity<ApiResponse<BookEntityResponse>> editBook(@RequestBody BookEntityRequest bookEntityRequest,
+                                                                    @PathVariable("bookEntityId")Long bookEntityId){
+        return bookService.editBook(bookEntityRequest,bookEntityId);
+    }
+
+    @DeleteMapping("/delete/{bookId}")
+    public ResponseEntity<ApiResponse<String>> deleteBook(@PathVariable("bookId")Long bookId){
+        return bookService.deleteBook(bookId);
+    }
+
+    @PatchMapping("/hide/{bookId}")
+    public ResponseEntity<ApiResponse<String>> hideBook(@PathVariable("bookId")Long bookId){
+        return bookService.hideBook(bookId);
     }
 }
