@@ -1,12 +1,18 @@
 package BooksVille.services.implementation;
 
 import BooksVille.entities.model.BookEntity;
+import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.exceptions.ApplicationException;
+import BooksVille.infrastructure.security.JWTGenerator;
+import BooksVille.payload.request.BookEntityRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
 import BooksVille.repositories.BookRepository;
+import BooksVille.repositories.UserEntityRepository;
 import BooksVille.services.BookService;
+import BooksVille.utils.HelperClass;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
@@ -14,12 +20,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final ModelMapper modelMapper;
+    private final HelperClass helperClass;
+    private final JWTGenerator jwtGenerator;
+    private final UserEntityRepository userEntityRepository;
+    private final HttpServletRequest request;
 
     @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> findById(Long id) {
@@ -72,5 +83,67 @@ public class BookServiceImpl implements BookService {
         );
     }
 
+    @Override
+    public ResponseEntity<ApiResponse<BookEntityResponse>> editBook(BookEntityRequest bookEntityRequest, Long bookEntityId) {
+        UserEntity existingAdmin = getCurrentUserFromToken(request);
+
+        Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookEntityId);
+
+        if(optionalBookEntity.isEmpty()){
+            throw new ApplicationException("Book with id " +bookEntityId+ " does not exist");
+        }
+
+        BookEntity existingBook = optionalBookEntity.get();
+        existingBook.setAuthor(bookEntityRequest.getAuthor());
+        existingBook.setBookTitle(bookEntityRequest.getBookTitle());
+        existingBook.setGenre(bookEntityRequest.getGenre());
+        existingBook.setDescription(bookEntityRequest.getDescription());
+        existingBook.setShortDescription(bookEntityRequest.getShortDescription());
+        existingBook.setPrice(bookEntityRequest.getPrice());
+
+        bookRepository.save(existingBook);
+
+        BookEntityResponse bookEntityResponse = BookEntityResponse.builder()
+                .userEntityId(existingAdmin.getId())
+                .id(existingBook.getId())
+                .author(existingBook.getAuthor())
+                .bookTitle(existingBook.getBookTitle())
+                .genre(existingBook.getGenre())
+                .description(existingBook.getDescription())
+                .shortDescription(existingBook.getShortDescription())
+                .build();
+        return ResponseEntity.ok(new ApiResponse<>("edited successfully",bookEntityResponse));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> deleteBook(Long bookId) {
+        Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookId);
+        if(optionalBookEntity.isEmpty()){
+            throw new ApplicationException("Book with id " +bookId+ " does not exist");
+        }
+        BookEntity existingBook = optionalBookEntity.get();
+        bookRepository.delete(existingBook);
+        return ResponseEntity.ok(new ApiResponse<>("Book with id " +bookId+ " deleted"));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> hideBook(Long bookId) {
+        Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookId);
+        if(optionalBookEntity.isEmpty()){
+            throw new ApplicationException("Book with id " +bookId+ " does not exist");
+        }
+        BookEntity existingBook = optionalBookEntity.get();
+        existingBook.setHidden(true);
+        bookRepository.save(existingBook);
+
+        return ResponseEntity.ok(new ApiResponse<>("Book with id " + bookId + " is now hidden"));
+    }
+
+    private UserEntity getCurrentUserFromToken(HttpServletRequest request) {
+        String token = helperClass.getTokenFromHttpRequest(request);
+        String email = jwtGenerator.getEmailFromJWT(token);
+        return userEntityRepository.findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("Invalid token or authentication issue"));
+    }
 
 }

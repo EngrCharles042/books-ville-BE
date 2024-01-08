@@ -31,6 +31,10 @@ public class BookEntityRequest {
     @Size(min = 10, max = 1000)
     private  String description;
 
+    @NotBlank(message = "Book description is required.")
+    @Size(min = 10, max = 100)
+    private  String shortDescription;
+
     @NotNull(message = "Book price must be declared.")
     private  BigDecimal price;
 }

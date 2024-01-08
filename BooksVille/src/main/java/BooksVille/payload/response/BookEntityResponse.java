@@ -17,10 +17,12 @@ import java.time.LocalDateTime;
 @Builder
 public class BookEntityResponse {
     private Long id;
+    private Long userEntityId;
     private LocalDateTime dateCreated;
     private String author;
     private String bookTitle;
     private Genre genre;
+    private  String description;
     private String shortDescription;
     private BigDecimal price;
 }
