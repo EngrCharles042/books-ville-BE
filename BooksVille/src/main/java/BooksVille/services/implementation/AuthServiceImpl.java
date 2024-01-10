@@ -199,6 +199,65 @@ public class AuthServiceImpl implements AuthService {
         }
 
     @Override
+    public ResponseEntity<ApiResponse<JwtAuthResponse>> adminLogin(LoginRequest loginRequest) {
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(loginRequest.getEmail());
+
+        if (userEntityOptional.isPresent()) {
+            Roles role = userEntityOptional.get().getRoles();
+
+            if (role != Roles.ADMIN) {
+                throw new ApplicationException("Unauthorized, Not an Admin");
+            }
+        }
+
+        // Authentication manager to authenticate user
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
+        );
+
+
+        if (userEntityOptional.isPresent() && !userEntityOptional.get().isVerified()) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ApiResponse<>("notVerified")
+            );
+        }
+
+        // Saving authentication in security context so user won't have to login everytime the network is called
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(authentication);
+
+        // Generate jwt token
+        String token = jwtGenerator.generateToken(authentication, SecurityConstants.JWT_EXPIRATION);
+
+        // Generate jwt refresh token
+        String refreshToken = jwtGenerator.generateToken(authentication, SecurityConstants.JWT_REFRESH_TOKEN_EXPIRATION);
+
+        UserEntity userEntity = userEntityOptional.get();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(
+                        new ApiResponse<>(
+                                "Login Successful",
+                                JwtAuthResponse.builder()
+                                        .accessToken(token)
+                                        .refreshToken(refreshToken)
+                                        .tokenType("Bearer")
+                                        .id(userEntity.getId())
+                                        .email(userEntity.getEmail())
+                                        .firstName(userEntity.getFirstName())
+                                        .lastName(userEntity.getLastName())
+                                        .role(userEntity.getRoles())
+                                        .build()
+                        )
+                );
+    }
+
+    @Override
     public void logout() {
         SecurityContextHolder.clearContext();
     }
