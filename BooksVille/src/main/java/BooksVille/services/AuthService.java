@@ -15,6 +15,7 @@ public interface AuthService {
     ResponseEntity<ApiResponse<String>> forgotPassword(String email);
     ResponseEntity<ApiResponse<String>> resetForgotPassword(ForgotPasswordResetRequest forgotPasswordResetRequest);
     ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest);
+    ResponseEntity<ApiResponse<JwtAuthResponse>> adminLogin(LoginRequest loginRequest);
     void logout();
     ResponseEntity<ApiResponse<String>> verifyToken(String receivedToken);
 }

@@ -60,6 +60,11 @@ public class AuthController {
         return authService.login(loginRequest);
     }
 
+    @PostMapping("/admin/login")
+    public ResponseEntity<ApiResponse<JwtAuthResponse>> adminLogin(@Valid @RequestBody LoginRequest loginRequest) {
+        return authService.adminLogin(loginRequest);
+    }
+
     @GetMapping("/logout")
     private ResponseEntity<ApiResponse<String>> logout(){
         authService.logout();
