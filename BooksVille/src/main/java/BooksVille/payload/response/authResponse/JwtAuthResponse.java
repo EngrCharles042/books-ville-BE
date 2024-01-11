@@ -12,14 +12,14 @@ import javax.management.relation.Role;
 @AllArgsConstructor
 @Builder
 public class JwtAuthResponse {
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String profilePicture;
-    private String email;
-    private Gender gender;
-    private Roles role;
-    private String accessToken;
-    private String refreshToken;
-    private String tokenType = "Bearer";
+    Long id;
+    String firstName;
+    String lastName;
+    String profilePicture;
+    String email;
+    Gender gender;
+    Roles role;
+    String accessToken;
+    String refreshToken;
+    String tokenType = "Bearer";
 }
