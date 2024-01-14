@@ -28,4 +28,6 @@ public class BookEntity extends BaseEntity{
     private BigDecimal price;
 
     private Boolean hidden = false;
+
+    private Integer rating;
 }
