@@ -13,4 +13,6 @@ public interface BookService {
     ResponseEntity<ApiResponse<BookEntityResponse>> editBook(BookEntityRequest bookEntityRequest, Long bookEntityId);
     ResponseEntity<ApiResponse<String>> deleteBook(Long bookId);
     ResponseEntity<ApiResponse<String>> hideBook(Long bookId);
+
+
 }
