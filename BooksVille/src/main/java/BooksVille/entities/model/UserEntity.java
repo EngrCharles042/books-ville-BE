@@ -1,6 +1,5 @@
 package BooksVille.entities.model;
 
-import BooksVille.entities.enums.Gender;
 import BooksVille.entities.enums.Roles;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,5 +36,5 @@ public class UserEntity extends BaseEntity{
     private boolean isVerified = false;
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
-    private List<OrderEntity> orderEntities = new ArrayList<>();
+    private List<TransactionEntity> transactions = new ArrayList<>();
 }
