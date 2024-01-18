@@ -6,9 +6,14 @@ import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
 import BooksVille.services.BookService;
 import BooksVille.utils.AppConstants;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +25,21 @@ public class BookController {
     public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@RequestParam Long id) {
         return bookService.findById(id);
 
+    }
+
+    @PostMapping("/add-book")
+    public ResponseEntity<ApiResponse<BookEntityResponse>> addBook(@Valid BookEntityRequest bookEntityRequest) throws IOException {
+        return bookService.addBook(bookEntityRequest);
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<?> downloadBook(@RequestParam("id") Long id) {
+        byte[] bookData = bookService.downloadImage(id);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(bookData);
     }
 
     @GetMapping("/books")

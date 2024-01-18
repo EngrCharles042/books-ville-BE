@@ -17,7 +17,7 @@ public class TransactionRequest {
     private BigDecimal amount;
 
     @NotNull(message = "Transaction Status cannot be null!")
-    private TransactStatus status;
+    private String status;
 
     @NotBlank(message = "Reference Id cannot be blank!")
     private String referenceId;

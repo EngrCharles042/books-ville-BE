@@ -25,7 +25,10 @@ public class BookEntity extends BaseEntity{
 
     private String description;
 
-    private String shortDescription;
+    private String bookCover;
+
+    @Lob
+    private byte[] bookData;
 
     private BigDecimal price;
 
