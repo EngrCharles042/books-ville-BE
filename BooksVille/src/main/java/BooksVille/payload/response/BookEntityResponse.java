@@ -1,15 +1,16 @@
 package BooksVille.payload.response;
 
 import BooksVille.entities.enums.Genre;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * DTO for {@link BooksVille.entities.model.BookEntity}
- */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,12 +18,10 @@ import java.time.LocalDateTime;
 @Builder
 public class BookEntityResponse {
     private Long id;
-    private Long userEntityId;
     private LocalDateTime dateCreated;
     private String author;
     private String bookTitle;
     private Genre genre;
-    private  String description;
-    private String shortDescription;
+    private String description;
     private BigDecimal price;
 }

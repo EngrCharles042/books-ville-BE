@@ -11,14 +11,18 @@ import BooksVille.payload.response.BookResponsePage;
 import BooksVille.repositories.BookRepository;
 import BooksVille.repositories.UserEntityRepository;
 import BooksVille.services.BookService;
+import BooksVille.services.FileUpload;
+import BooksVille.utils.FileUtils;
 import BooksVille.utils.HelperClass;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +35,7 @@ public class BookServiceImpl implements BookService {
     private final JWTGenerator jwtGenerator;
     private final UserEntityRepository userEntityRepository;
     private final HttpServletRequest request;
+    private final FileUpload fileUpload;
 
     @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> findById(Long id) {
@@ -84,6 +89,37 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public ResponseEntity<ApiResponse<BookEntityResponse>> addBook(BookEntityRequest bookEntityRequest) throws IOException {
+        BookEntity bookEntity = BookEntity.builder()
+                .author(bookEntityRequest.getAuthor())
+                .bookTitle(bookEntityRequest.getBookTitle())
+                .genre(bookEntityRequest.getGenre())
+                .description(bookEntityRequest.getDescription())
+                .bookCover(fileUpload.uploadFile(bookEntityRequest.getBookCover()))
+                .bookData(FileUtils.compressImage(bookEntityRequest.getBookFile().getBytes()))
+                .price(bookEntityRequest.getPrice())
+                .build();
+
+        BookEntity savedBook = bookRepository.save(bookEntity);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        new ApiResponse<>(
+                                "success",
+                                modelMapper.map(savedBook, BookEntityResponse.class)
+                        )
+                );
+    }
+
+    @Override
+    public byte[] downloadImage(Long id) {
+        Optional<BookEntity> dbFileData = bookRepository.findById(id);
+
+        return FileUtils.decompressImage(dbFileData.get().getBookData());
+    }
+
+    @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> editBook(BookEntityRequest bookEntityRequest, Long bookEntityId) {
         UserEntity existingAdmin = getCurrentUserFromToken(request);
 
@@ -98,19 +134,16 @@ public class BookServiceImpl implements BookService {
         existingBook.setBookTitle(bookEntityRequest.getBookTitle());
         existingBook.setGenre(bookEntityRequest.getGenre());
         existingBook.setDescription(bookEntityRequest.getDescription());
-        existingBook.setShortDescription(bookEntityRequest.getShortDescription());
         existingBook.setPrice(bookEntityRequest.getPrice());
 
         bookRepository.save(existingBook);
 
         BookEntityResponse bookEntityResponse = BookEntityResponse.builder()
-                .userEntityId(existingAdmin.getId())
                 .id(existingBook.getId())
                 .author(existingBook.getAuthor())
                 .bookTitle(existingBook.getBookTitle())
                 .genre(existingBook.getGenre())
                 .description(existingBook.getDescription())
-                .shortDescription(existingBook.getShortDescription())
                 .build();
         return ResponseEntity.ok(new ApiResponse<>("edited successfully",bookEntityResponse));
     }
