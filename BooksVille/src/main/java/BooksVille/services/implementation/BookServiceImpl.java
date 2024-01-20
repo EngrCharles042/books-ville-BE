@@ -1,5 +1,6 @@
 package BooksVille.services.implementation;
 
+import BooksVille.entities.enums.Genre;
 import BooksVille.entities.model.BookEntity;
 import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.exceptions.ApplicationException;
@@ -93,7 +94,7 @@ public class BookServiceImpl implements BookService {
         BookEntity bookEntity = BookEntity.builder()
                 .author(bookEntityRequest.getAuthor())
                 .bookTitle(bookEntityRequest.getBookTitle())
-                .genre(bookEntityRequest.getGenre())
+                .genre(Genre.valueOf(bookEntityRequest.getGenre()))
                 .description(bookEntityRequest.getDescription())
                 .bookCover(fileUpload.uploadFile(bookEntityRequest.getBookCover()))
                 .bookData(FileUtils.compressImage(bookEntityRequest.getBookFile().getBytes()))
@@ -132,7 +133,7 @@ public class BookServiceImpl implements BookService {
         BookEntity existingBook = optionalBookEntity.get();
         existingBook.setAuthor(bookEntityRequest.getAuthor());
         existingBook.setBookTitle(bookEntityRequest.getBookTitle());
-        existingBook.setGenre(bookEntityRequest.getGenre());
+        existingBook.setGenre(Genre.valueOf(bookEntityRequest.getGenre()));
         existingBook.setDescription(bookEntityRequest.getDescription());
         existingBook.setPrice(bookEntityRequest.getPrice());
 

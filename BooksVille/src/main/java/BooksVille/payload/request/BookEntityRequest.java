@@ -26,7 +26,7 @@ public class BookEntityRequest {
     private  String bookTitle;
 
     @NotNull(message = "Genre is required")
-    private Genre genre;
+    private String genre;
 
     @NotNull(message = "cover is required")
     private MultipartFile bookCover;
@@ -36,8 +36,8 @@ public class BookEntityRequest {
 
     @NotBlank(message = "Book description is required.")
     @Size(min = 10, max = 1000)
-    private  String description;
+    private String description;
 
     @NotNull(message = "Book price must be declared.")
-    private  BigDecimal price;
+    private BigDecimal price;
 }
