@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -25,16 +26,18 @@ public class BookEntityRequest {
     private  String bookTitle;
 
     @NotNull(message = "Genre is required")
-    private  Genre genre;
+    private String genre;
+
+    @NotNull(message = "cover is required")
+    private MultipartFile bookCover;
+
+    @NotNull(message = "bookFile is required")
+    private MultipartFile bookFile;
 
     @NotBlank(message = "Book description is required.")
     @Size(min = 10, max = 1000)
-    private  String description;
-
-    @NotBlank(message = "Book description is required.")
-    @Size(min = 10, max = 100)
-    private  String shortDescription;
+    private String description;
 
     @NotNull(message = "Book price must be declared.")
-    private  BigDecimal price;
+    private BigDecimal price;
 }
