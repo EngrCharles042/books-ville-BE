@@ -2,12 +2,19 @@ package BooksVille.services.implementation;
 
 import BooksVille.entities.enums.Genre;
 import BooksVille.entities.model.BookEntity;
+import BooksVille.entities.model.UserEntity;
+import BooksVille.infrastructure.exceptions.ApplicationException;
+import BooksVille.infrastructure.security.JWTGenerator;
 import BooksVille.payload.request.BookFilterRequest;
+import BooksVille.payload.request.UserEntityRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
 import BooksVille.repositories.BookRepository;
+import BooksVille.repositories.UserEntityRepository;
 import BooksVille.services.UserService;
+import BooksVille.utils.HelperClass;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -27,6 +34,22 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
     private final BookRepository bookRepository;
+    private final UserEntityRepository userEntityRepository;
+    private final HelperClass helperClass;
+    private final HttpServletRequest request;
+    private final JWTGenerator jwtGenerator;
+
+    @Override
+    public UserEntity getUserEntity() {
+        String token = helperClass.getTokenFromHttpRequest(request);
+
+        String email = jwtGenerator.getEmailFromJWT(token);
+
+        return  userEntityRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("User does not exist with email " + email));
+    }
+
     @Override
     public ResponseEntity<ApiResponse<List<BookEntityResponse>>> searchBooks(String query) {
         List<BookEntity> bookSearch = bookRepository.searchBook(query);
@@ -75,5 +98,18 @@ public class UserServiceImpl implements UserService {
                                 .build()
                 )
         );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> userInfoUpdate(UserEntityRequest userEntityRequest) {
+        UserEntity userEntity = getUserEntity();
+
+        userEntity.setFirstName(userEntityRequest.getFirstName());
+        userEntity.setLastName(userEntity.getLastName());
+        userEntity.setPhoneNumber(userEntityRequest.getPhoneNumber());
+
+        userEntityRepository.save(userEntity);
+
+        return ResponseEntity.ok(new ApiResponse<>("update successful"));
     }
 }
