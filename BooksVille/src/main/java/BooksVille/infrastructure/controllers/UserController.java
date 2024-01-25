@@ -1,6 +1,7 @@
 package BooksVille.infrastructure.controllers;
 
 import BooksVille.payload.request.BookFilterRequest;
+import BooksVille.payload.request.UserEntityRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
@@ -10,10 +11,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +35,11 @@ public class UserController {
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
 
         return userService.filterBooks(pageNo, pageSize, sortBy, sortDir, bookFilterRequest);
+    }
+
+    @PutMapping("/account-info")
+    public ResponseEntity<ApiResponse<String>> userInfoUpdate(@org.springframework.web.bind.annotation.RequestBody UserEntityRequest userEntityRequest) {
+
+        return userService.userInfoUpdate(userEntityRequest);
     }
 }
