@@ -12,6 +12,7 @@ import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
 import BooksVille.repositories.BookRepository;
 import BooksVille.repositories.UserEntityRepository;
+import BooksVille.services.FileUpload;
 import BooksVille.services.UserService;
 import BooksVille.utils.HelperClass;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final HelperClass helperClass;
     private final HttpServletRequest request;
     private final JWTGenerator jwtGenerator;
+    private final FileUpload fileUpload;
 
     @Override
     public UserEntity getUserEntity() {
@@ -111,5 +115,23 @@ public class UserServiceImpl implements UserService {
         userEntityRepository.save(userEntity);
 
         return ResponseEntity.ok(new ApiResponse<>("update successful"));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> profilePicUpdate(MultipartFile multipartFile) throws IOException {
+        String fileUrl = fileUpload.uploadFile(multipartFile);
+
+        UserEntity userEntity = getUserEntity();
+
+        userEntity.setProfilePicture(fileUrl);
+
+        userEntityRepository.save(userEntity);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "profile picture updated successfully"
+                )
+        );
     }
 }

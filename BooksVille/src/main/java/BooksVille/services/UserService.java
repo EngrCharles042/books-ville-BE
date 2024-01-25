@@ -7,7 +7,9 @@ import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -19,4 +21,6 @@ public interface UserService {
     );
 
     ResponseEntity<ApiResponse<String>> userInfoUpdate(UserEntityRequest userEntityRequest);
+
+    ResponseEntity<ApiResponse<String>> profilePicUpdate(MultipartFile multipartFile) throws IOException;
 }
