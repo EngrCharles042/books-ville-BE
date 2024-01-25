@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = getUserEntity();
 
         userEntity.setFirstName(userEntityRequest.getFirstName());
-        userEntity.setLastName(userEntity.getLastName());
+        userEntity.setLastName(userEntityRequest.getLastName());
         userEntity.setPhoneNumber(userEntityRequest.getPhoneNumber());
 
         userEntityRepository.save(userEntity);

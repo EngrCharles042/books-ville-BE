@@ -7,7 +7,6 @@ import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
 import BooksVille.services.UserService;
 import BooksVille.utils.AppConstants;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +37,7 @@ public class UserController {
     }
 
     @PutMapping("/account-info")
-    public ResponseEntity<ApiResponse<String>> userInfoUpdate(@org.springframework.web.bind.annotation.RequestBody UserEntityRequest userEntityRequest) {
+    public ResponseEntity<ApiResponse<String>> userInfoUpdate(@RequestBody UserEntityRequest userEntityRequest) {
 
         return userService.userInfoUpdate(userEntityRequest);
     }
