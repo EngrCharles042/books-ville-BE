@@ -28,4 +28,7 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
     Optional<BookEntity> findBookEntitiesById(Long bookEntityId);
 
     Page<BookEntity> findBookEntitiesByGenreContainingAndRating(Genre genre, Integer rating, Pageable pageable);
+
+
+
 }

@@ -12,4 +12,6 @@ public interface AdminService {
     ResponseEntity<ApiResponse<BookEntityResponse>> addBook(BookEntityRequest bookEntityRequest);
     ResponseEntity<ApiResponse<BookResponsePage>> getAllBooks(int pageNo, int pageSize, String sortBy, String sortDir);
     ResponseEntity<ApiResponse<List<BookEntityResponse>>> searchBooks(String query);
+
+    ResponseEntity<ApiResponse<String>> hideBook(Long bookId);
 }
