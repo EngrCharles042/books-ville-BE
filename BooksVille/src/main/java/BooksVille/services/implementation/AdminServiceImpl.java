@@ -99,4 +99,19 @@ public class AdminServiceImpl implements AdminService {
                 .toList();
         return ResponseEntity.ok(new ApiResponse<>("search complete",searchResponses));
     }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> hideBook(Long bookId) {
+        Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookId);
+
+        if(optionalBookEntity.isEmpty()){
+            throw new ApplicationException("Book with id " +bookId+ " does not exist");
+        }
+
+        BookEntity existingBook = optionalBookEntity.get();
+        existingBook.setHidden(true);
+        bookRepository.save(existingBook);
+        return ResponseEntity.ok(new ApiResponse<>("Book with id " + bookId + " is now hidden"));
+
+    }
 }

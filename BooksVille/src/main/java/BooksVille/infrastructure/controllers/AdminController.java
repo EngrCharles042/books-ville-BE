@@ -33,8 +33,14 @@ public class AdminController {
 
         return adminService.getAllBooks(pageNo, pageSize, sortBy, sortDir);
     }
+
     @GetMapping("/search/title-or-author-or-price-or-genre")
-    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> bookSearchWithKeyword (@RequestParam("query")String query) {
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> bookSearchWithKeyword(@RequestParam("query") String query) {
         return adminService.searchBooks(query);
+    }
+
+    @PatchMapping("/hide/{bookId}")
+    public ResponseEntity<ApiResponse<String>> hideBook(@PathVariable("bookId") Long bookId) {
+        return adminService.hideBook(bookId);
     }
 }
