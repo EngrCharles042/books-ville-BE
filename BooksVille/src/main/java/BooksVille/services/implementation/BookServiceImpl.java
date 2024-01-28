@@ -71,7 +71,8 @@ public class BookServiceImpl implements BookService {
         List<BookEntity> bookEntities = bookEntitiesPage.getContent();
 
         List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
-                .map(bookEntityResponse -> modelMapper.map(bookEntityResponse, BookEntityResponse.class))
+                .map(bookEntityResponse -> modelMapper
+                        .map(bookEntityResponse, BookEntityResponse.class))
                 .toList();
 
         return ResponseEntity.ok(
@@ -94,7 +95,7 @@ public class BookServiceImpl implements BookService {
         BookEntity bookEntity = BookEntity.builder()
                 .author(bookEntityRequest.getAuthor())
                 .bookTitle(bookEntityRequest.getBookTitle())
-                .genre(Genre.valueOf(bookEntityRequest.getGenre()))
+                .genre(bookEntityRequest.getGenre())
                 .description(bookEntityRequest.getDescription())
                 .bookCover(fileUpload.uploadFile(bookEntityRequest.getBookCover()))
                 .bookData(FileUtils.compressImage(bookEntityRequest.getBookFile().getBytes()))
@@ -133,7 +134,7 @@ public class BookServiceImpl implements BookService {
         BookEntity existingBook = optionalBookEntity.get();
         existingBook.setAuthor(bookEntityRequest.getAuthor());
         existingBook.setBookTitle(bookEntityRequest.getBookTitle());
-        existingBook.setGenre(Genre.valueOf(bookEntityRequest.getGenre()));
+        existingBook.setGenre(bookEntityRequest.getGenre());
         existingBook.setDescription(bookEntityRequest.getDescription());
         existingBook.setPrice(bookEntityRequest.getPrice());
 
@@ -152,12 +153,20 @@ public class BookServiceImpl implements BookService {
     @Override
     public ResponseEntity<ApiResponse<String>> deleteBook(Long bookId) {
         Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookId);
+
         if(optionalBookEntity.isEmpty()){
             throw new ApplicationException("Book with id " +bookId+ " does not exist");
         }
+
         BookEntity existingBook = optionalBookEntity.get();
+
         bookRepository.delete(existingBook);
-        return ResponseEntity.ok(new ApiResponse<>("Book with id " +bookId+ " deleted"));
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "Book with id " +bookId+ " deleted"
+                )
+        );
     }
 
     @Override

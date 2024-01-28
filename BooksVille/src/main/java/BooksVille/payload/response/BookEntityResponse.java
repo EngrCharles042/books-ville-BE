@@ -21,7 +21,10 @@ public class BookEntityResponse {
     private LocalDateTime dateCreated;
     private String author;
     private String bookTitle;
-    private Genre genre;
+    private String genre;
     private String description;
     private BigDecimal price;
+    private String bookCover;
+    private Boolean hidden;
+    private Integer rating;
 }

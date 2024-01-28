@@ -1,7 +1,11 @@
 package BooksVille.entities.enums;
 
 public enum Genre {
-    FICTION,
-    COMICS,
-    ROMANCE
+    FANTASY,
+    NON_FICTION,
+    ADVENTURE,
+    ROMANCE,
+    HORROR,
+    MUSICAL,
+    SPIRITUAL,
 }
