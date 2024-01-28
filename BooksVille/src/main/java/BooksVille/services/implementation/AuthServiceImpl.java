@@ -189,6 +189,7 @@ public class AuthServiceImpl implements AuthService {
                                         .refreshToken(refreshToken)
                                         .tokenType("Bearer")
                                         .id(userEntity.getId())
+                                        .profilePicture(userEntity.getProfilePicture())
                                         .email(userEntity.getEmail())
                                         .phoneNumber(userEntity.getPhoneNumber())
                                         .firstName(userEntity.getFirstName())

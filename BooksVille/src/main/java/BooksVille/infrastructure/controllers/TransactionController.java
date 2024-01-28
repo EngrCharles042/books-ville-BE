@@ -21,4 +21,12 @@ public class TransactionController {
     public ResponseEntity<ApiResponse<String>> payment(@Valid @RequestBody TransactionRequest transactionRequest) {
         return transactionService.bookPayment(transactionRequest);
     }
+
+    @PostMapping("/webhook/url")
+    public ResponseEntity<String> paystackWebhook() {
+        System.out.println("webhooks called");
+
+        return ResponseEntity.ok("Success");
+    }
+
 }

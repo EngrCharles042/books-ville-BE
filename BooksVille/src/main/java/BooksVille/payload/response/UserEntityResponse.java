@@ -18,9 +18,7 @@ public class UserEntityResponse {
     private String firstName;
     private String lastName;
     private String email;
+    private String profilePicture;
     private String phoneNumber;
-    private String address;
     private String gender;
-    private String availableStatus;
-    private String activeStatus;
 }

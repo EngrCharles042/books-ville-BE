@@ -5,10 +5,12 @@ import BooksVille.payload.request.UserEntityRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
+import BooksVille.payload.response.UserEntityResponse;
 import BooksVille.services.UserService;
 import BooksVille.utils.AppConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +23,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final ModelMapper mapper;
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<UserEntityResponse>> getUser() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        mapper.map(userService.getUserEntity(), UserEntityResponse.class)
+                )
+        );
+    }
 
     @GetMapping("/search/title-or-author-or-price-or-genre")
     public ResponseEntity<ApiResponse<List<BookEntityResponse>>> bookSearchWithKeyword (@RequestParam("query")String query) {

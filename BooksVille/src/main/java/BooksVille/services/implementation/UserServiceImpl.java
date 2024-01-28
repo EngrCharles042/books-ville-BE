@@ -125,12 +125,12 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setProfilePicture(fileUrl);
 
-        userEntityRepository.save(userEntity);
+        UserEntity savedUser = userEntityRepository.save(userEntity);
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         "success",
-                        "profile picture updated successfully"
+                        fileUrl
                 )
         );
     }

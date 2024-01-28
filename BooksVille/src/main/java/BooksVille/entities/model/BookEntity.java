@@ -20,14 +20,15 @@ public class BookEntity extends BaseEntity{
 
     private String bookTitle;
 
-    @Enumerated(EnumType.STRING)
-    private Genre genre;
+    private String genre;
 
+    @Column(length = 2500)
     private String description;
 
     private String bookCover;
 
     @Lob
+    @Column(length = 2500)
     private byte[] bookData;
 
     private BigDecimal price;

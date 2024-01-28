@@ -17,12 +17,12 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class BookEntityRequest {
 
-    @Size(min = 2, max = 100, message = "Author's name is too long or short")
+    @Size(min = 1, max = 100, message = "Author's name is too long or short")
     @NotBlank(message = "Name cannot be blank")
     private  String author;
 
     @NotBlank(message = "Title title is required.")
-    @Size(min = 10, max = 100)
+    @Size(min = 1, max = 100)
     private  String bookTitle;
 
     @NotNull(message = "Genre is required")
@@ -35,7 +35,7 @@ public class BookEntityRequest {
     private MultipartFile bookFile;
 
     @NotBlank(message = "Book description is required.")
-    @Size(min = 10, max = 1000)
+    @Size(min = 3, max = 2500)
     private String description;
 
     @NotNull(message = "Book price must be declared.")

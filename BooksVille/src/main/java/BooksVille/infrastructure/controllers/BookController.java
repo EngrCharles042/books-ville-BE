@@ -24,7 +24,6 @@ public class BookController {
     @GetMapping("/get-book")
     public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@RequestParam Long id) {
         return bookService.findById(id);
-
     }
 
     @PostMapping("/add-book")
@@ -52,15 +51,15 @@ public class BookController {
         return bookService.getAllBooks(pageNo, pageSize, sortBy, sortDir);
     }
 
-    @PutMapping("/edit/{bookEntityId}")
+    @PutMapping("/edit/{id}")
     public ResponseEntity<ApiResponse<BookEntityResponse>> editBook(@RequestBody BookEntityRequest bookEntityRequest,
-                                                                    @PathVariable("bookEntityId")Long bookEntityId){
-        return bookService.editBook(bookEntityRequest,bookEntityId);
+                                                                    @PathVariable Long id){
+        return bookService.editBook(bookEntityRequest,id);
     }
 
-    @DeleteMapping("/delete/{bookId}")
-    public ResponseEntity<ApiResponse<String>> deleteBook(@PathVariable("bookId")Long bookId){
-        return bookService.deleteBook(bookId);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteBook(@PathVariable Long id){
+        return bookService.deleteBook(id);
     }
 
     @PatchMapping("/hide/{bookId}")
