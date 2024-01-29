@@ -1,6 +1,7 @@
 package BooksVille.infrastructure.controllers;
 
 import BooksVille.payload.request.TransactionRequest;
+import BooksVille.payload.request.payment.PayStackRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.services.TransactionService;
 import jakarta.validation.Valid;
@@ -29,4 +30,12 @@ public class TransactionController {
         return ResponseEntity.ok("Success");
     }
 
+    @PostMapping("/paystack")
+    public ResponseEntity<String> pay(@RequestBody PayStackRequest payStackRequest) {
+        System.out.println(payStackRequest.getStatus());
+
+        return ResponseEntity.ok(
+                "Success"
+        );
+    }
 }
