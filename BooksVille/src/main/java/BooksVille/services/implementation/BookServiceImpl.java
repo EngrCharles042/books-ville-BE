@@ -2,6 +2,7 @@ package BooksVille.services.implementation;
 
 import BooksVille.entities.enums.Genre;
 import BooksVille.entities.model.BookEntity;
+import BooksVille.entities.model.SavedBooksEntity;
 import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.exceptions.ApplicationException;
 import BooksVille.infrastructure.security.JWTGenerator;
@@ -10,6 +11,7 @@ import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
 import BooksVille.repositories.BookRepository;
+import BooksVille.repositories.SavedBooksEntityRepository;
 import BooksVille.repositories.UserEntityRepository;
 import BooksVille.services.BookService;
 import BooksVille.services.FileUpload;
@@ -31,6 +33,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
+    private final SavedBooksEntityRepository savedBooksEntityRepository;
     private final ModelMapper modelMapper;
     private final HelperClass helperClass;
     private final JWTGenerator jwtGenerator;
@@ -123,7 +126,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> editBook(BookEntityRequest bookEntityRequest, Long bookEntityId) {
-        UserEntity existingAdmin = getCurrentUserFromToken(request);
+        UserEntity existingAdmin = getCurrentUserFromToken();
 
         Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookEntityId);
 
@@ -182,12 +185,71 @@ public class BookServiceImpl implements BookService {
         return ResponseEntity.ok(new ApiResponse<>("Book with id " + bookId + " is now hidden"));
     }
 
-    private UserEntity getCurrentUserFromToken(HttpServletRequest request) {
+    @Override
+    public ResponseEntity<ApiResponse<String>> saveBook(Long id) {
+        BookEntity book = bookRepository.
+                findById(id)
+                .orElseThrow(
+                    () -> new ApplicationException("Book not found with id: " + id)
+                );
+
+        UserEntity userEntity = getCurrentUserFromToken();
+
+        savedBooksEntityRepository.save(
+                SavedBooksEntity.builder()
+                        .bookEntity(book)
+                        .userEntity(userEntity)
+                        .build()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        new ApiResponse<>(
+                                "Book saved successfully",
+                                "success"
+                        )
+                );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<BookResponsePage>> getSavedBooks(int pageNo, int pageSize, String sortBy, String sortDir) {
+        // Sort condition
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<SavedBooksEntity> savedBooksEntitiesPage = savedBooksEntityRepository
+                .findSavedBooksEntitiesByUserEntity(getCurrentUserFromToken(), pageable);
+
+        List<SavedBooksEntity> bookEntities = savedBooksEntitiesPage.getContent();
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(bookEntityResponse -> modelMapper
+                        .map(bookEntityResponse.getBookEntity(), BookEntityResponse.class))
+                .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "Success",
+                        BookResponsePage.builder()
+                                .content(bookEntityResponses)
+                                .pageNo(savedBooksEntitiesPage.getNumber())
+                                .pageSize(savedBooksEntitiesPage.getSize())
+                                .totalElements(savedBooksEntitiesPage.getTotalElements())
+                                .totalPages(savedBooksEntitiesPage.getTotalPages())
+                                .last(savedBooksEntitiesPage.isLast())
+                                .build()
+                )
+        );
+    }
+
+    private UserEntity getCurrentUserFromToken() {
         String token = helperClass.getTokenFromHttpRequest(request);
         String email = jwtGenerator.getEmailFromJWT(token);
         return userEntityRepository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationException("Invalid token or authentication issue"));
     }
-
-
 }
