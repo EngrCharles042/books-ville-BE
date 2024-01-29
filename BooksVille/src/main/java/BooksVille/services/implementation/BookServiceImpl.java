@@ -57,7 +57,6 @@ public class BookServiceImpl implements BookService {
                          bookEntityResponse
                  )
          );
-
     }
 
     @Override
