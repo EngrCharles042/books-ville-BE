@@ -24,6 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @EnableAsync
@@ -47,6 +48,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
+
+        //SSO google login configuration
+        security.oauth2Login(withDefaults());
 
         // Execute JwtAuthenticationFilter before the UsernamePasswordAuthenticationFilter of spring security
         security.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
