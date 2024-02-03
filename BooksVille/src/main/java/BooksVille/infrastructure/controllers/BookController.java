@@ -31,15 +31,15 @@ public class BookController {
         return bookService.addBook(bookEntityRequest);
     }
 
-    @GetMapping("/download")
-    public ResponseEntity<?> downloadBook(@RequestParam("id") Long id) {
-        byte[] bookData = bookService.downloadImage(id);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(bookData);
-    }
+//    @GetMapping("/download")
+//    public ResponseEntity<?> downloadBook(@RequestParam("id") Long id) {
+//        byte[] bookData = bookService.downloadImage(id);
+//
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .contentType(MediaType.APPLICATION_PDF)
+//                .body(bookData);
+//    }
 
     @GetMapping("/books")
     public ResponseEntity<ApiResponse<BookResponsePage>> getAllBooks(
@@ -80,5 +80,15 @@ public class BookController {
     @PostMapping("/save/{id}")
     public ResponseEntity<ApiResponse<String>> saveBook(@PathVariable Long id) {
         return bookService.saveBook(id);
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<?> downloadBooks(@RequestParam("book_id") Long book_Id) {
+        byte[] bookData = bookService.downloadBook(book_Id);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(bookData);
     }
 }

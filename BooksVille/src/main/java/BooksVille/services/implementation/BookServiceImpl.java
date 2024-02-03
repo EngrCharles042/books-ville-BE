@@ -3,6 +3,7 @@ package BooksVille.services.implementation;
 import BooksVille.entities.enums.Genre;
 import BooksVille.entities.model.BookEntity;
 import BooksVille.entities.model.SavedBooksEntity;
+import BooksVille.entities.model.TransactionEntity;
 import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.exceptions.ApplicationException;
 import BooksVille.infrastructure.security.JWTGenerator;
@@ -12,6 +13,7 @@ import BooksVille.payload.response.BookEntityResponse;
 import BooksVille.payload.response.BookResponsePage;
 import BooksVille.repositories.BookRepository;
 import BooksVille.repositories.SavedBooksEntityRepository;
+import BooksVille.repositories.TransactionEntityRepository;
 import BooksVille.repositories.UserEntityRepository;
 import BooksVille.services.BookService;
 import BooksVille.services.FileUpload;
@@ -40,6 +42,7 @@ public class BookServiceImpl implements BookService {
     private final UserEntityRepository userEntityRepository;
     private final HttpServletRequest request;
     private final FileUpload fileUpload;
+    private final TransactionEntityRepository transactionEntityRepository;
 
     @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> findById(Long id) {
@@ -116,12 +119,12 @@ public class BookServiceImpl implements BookService {
                 );
     }
 
-    @Override
-    public byte[] downloadImage(Long id) {
-        Optional<BookEntity> dbFileData = bookRepository.findById(id);
-
-        return FileUtils.decompressImage(dbFileData.get().getBookData());
-    }
+//    @Override
+//    public byte[] downloadImage(Long id) {
+//        Optional<BookEntity> dbFileData = bookRepository.findById(id);
+//
+//        return FileUtils.decompressImage(dbFileData.get().getBookData());
+//    }
 
     @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> editBook(BookEntityRequest bookEntityRequest, Long bookEntityId) {
@@ -250,5 +253,36 @@ public class BookServiceImpl implements BookService {
         String email = jwtGenerator.getEmailFromJWT(token);
         return userEntityRepository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationException("Invalid token or authentication issue"));
+    }
+
+    public byte[] downloadBook (Long book_id){
+        String email = jwtGenerator.getEmailFromJWT(helperClass.getTokenFromHttpRequest(request));
+
+        UserEntity userEntity = userEntityRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("User Not Found"));
+
+        if(!userEntity.isVerified()){
+            throw new ApplicationException("Email Not Verified");
+        }
+
+        BookEntity bookEntity = bookRepository.findById(book_id).orElseThrow(
+                () -> new ApplicationException("Book Not Found")
+        );
+
+        Optional<TransactionEntity> transactions = transactionEntityRepository
+                .findByUserEntityAndBookEntity(userEntity, bookEntity);
+
+        if(transactions.isPresent()){
+            BookEntity book = transactions.get().getBookEntity();
+
+
+            byte[] bookFile = FileUtils.decompressImage(book.getBookData());
+
+            return bookFile;
+
+        } else {
+            throw new ApplicationException("No completed transaction found. Please make a payment to download the book.");
+        }
     }
 }
