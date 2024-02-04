@@ -31,16 +31,6 @@ public class BookController {
         return bookService.addBook(bookEntityRequest);
     }
 
-//    @GetMapping("/download")
-//    public ResponseEntity<?> downloadBook(@RequestParam("id") Long id) {
-//        byte[] bookData = bookService.downloadImage(id);
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .contentType(MediaType.APPLICATION_PDF)
-//                .body(bookData);
-//    }
-
     @GetMapping("/books")
     public ResponseEntity<ApiResponse<BookResponsePage>> getAllBooks(
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
