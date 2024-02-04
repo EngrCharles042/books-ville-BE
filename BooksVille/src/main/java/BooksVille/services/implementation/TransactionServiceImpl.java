@@ -6,6 +6,8 @@ import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.exceptions.ApplicationException;
 import BooksVille.infrastructure.security.JWTGenerator;
 import BooksVille.payload.request.TransactionRequest;
+import BooksVille.payload.request.payment.FlutterWaveRequest;
+import BooksVille.payload.request.payment.PayStackRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.repositories.BookEntityRepository;
 import BooksVille.repositories.TransactionEntityRepository;
@@ -24,7 +26,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final UserEntityRepository userEntityRepository;
-    private final ModelMapper modelMapper;
     private final TransactionEntityRepository transactionEntityRepository;
     private final HelperClass helperClass;
     private final HttpServletRequest httpServletRequest;
@@ -32,7 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final BookEntityRepository bookEntityRepository;
 
     @Override
-    public ResponseEntity<ApiResponse<String>> bookPayment(TransactionRequest transactionRequest) {
+    public ResponseEntity<ApiResponse<String>> PayStackPayment(PayStackRequest payStackRequest, Long bookId) {
         String email = jwtGenerator.getEmailFromJWT(helperClass.getTokenFromHttpRequest(httpServletRequest));
 
         UserEntity userEntity = userEntityRepository
@@ -42,23 +43,63 @@ public class TransactionServiceImpl implements TransactionService {
                 );
 
         BookEntity bookEntity = bookEntityRepository
-                .findById(transactionRequest.getBookEntityId())
+                .findById(bookId)
                 .orElseThrow(
                         () -> new ApplicationException("Book not found")
                 );
 
-        TransactionEntity transactionEntity = modelMapper.map(transactionRequest, TransactionEntity.class);
+        TransactionEntity transactionEntity = TransactionEntity.builder()
+                .amount(bookEntity.getPrice())
+                .status(payStackRequest.getStatus())
+                .referenceId(payStackRequest.getTrxref())
+                .bookEntity(bookEntity)
+                .userEntity(userEntity)
+                .build();
 
-        transactionEntity.setUserEntity(userEntity);
-        transactionEntity.setBookEntity(bookEntity);
-
-        transactionEntityRepository.save(transactionEntity);
+        TransactionEntity savedTransaction = transactionEntityRepository.save(transactionEntity);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
                         new ApiResponse<>(
-                                "success"
+                                "success",
+                                savedTransaction.getStatus()
+                        )
+                );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> FlutterPayment(FlutterWaveRequest flutterWaveRequest, Long bookId) {
+        String email = jwtGenerator.getEmailFromJWT(helperClass.getTokenFromHttpRequest(httpServletRequest));
+
+        UserEntity userEntity = userEntityRepository
+                .findByEmail(email)
+                .orElseThrow(
+                        () -> new ApplicationException("User not found")
+                );
+
+        BookEntity bookEntity = bookEntityRepository
+                .findById(bookId)
+                .orElseThrow(
+                        () -> new ApplicationException("Book not found")
+                );
+
+        TransactionEntity transactionEntity = TransactionEntity.builder()
+                .amount(bookEntity.getPrice())
+                .status(flutterWaveRequest.getStatus())
+                .referenceId(flutterWaveRequest.getTx_ref())
+                .bookEntity(bookEntity)
+                .userEntity(userEntity)
+                .build();
+
+        TransactionEntity savedTransaction = transactionEntityRepository.save(transactionEntity);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        new ApiResponse<>(
+                                "success",
+                                savedTransaction.getStatus()
                         )
                 );
     }
