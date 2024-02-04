@@ -6,6 +6,7 @@ import BooksVille.entities.model.UserEntity;
 import BooksVille.infrastructure.exceptions.ApplicationException;
 import BooksVille.infrastructure.security.JWTGenerator;
 import BooksVille.payload.request.BookFilterRequest;
+import BooksVille.payload.request.ChangePasswordRequest;
 import BooksVille.payload.request.UserEntityRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
@@ -22,7 +23,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +41,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final BookRepository bookRepository;
     private final UserEntityRepository userEntityRepository;
@@ -133,5 +141,45 @@ public class UserServiceImpl implements UserService {
                         fileUrl
                 )
         );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<String>> changePassword(ChangePasswordRequest changePasswordRequest) {
+        UserEntity userEntity = getUserEntity();
+
+        Authentication authentication;
+
+        try {
+            // Authentication manager to authenticate user
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            userEntity.getEmail(),
+                            changePasswordRequest.getOldPassword()
+                    )
+            );
+        } catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
+
+        userEntity.setPassword(
+                passwordEncoder.encode(
+                        changePasswordRequest.getNewPassword()
+                )
+        );
+
+        userEntityRepository.save(userEntity);
+
+        // Saving authentication in security context so user won't have to login everytime the network is called
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(authentication);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        new ApiResponse<>(
+                                "Password Changed Successfully"
+                        )
+                );
     }
 }

@@ -1,6 +1,7 @@
 package BooksVille.infrastructure.controllers;
 
 import BooksVille.payload.request.BookFilterRequest;
+import BooksVille.payload.request.ChangePasswordRequest;
 import BooksVille.payload.request.UserEntityRequest;
 import BooksVille.payload.response.ApiResponse;
 import BooksVille.payload.response.BookEntityResponse;
@@ -61,5 +62,10 @@ public class UserController {
     public ResponseEntity<ApiResponse<String>> profilePicUpdate(@RequestParam MultipartFile profilePic) throws IOException {
 
         return userService.profilePicUpdate(profilePic);
+    }
+
+    @PatchMapping("change-password")
+    public ResponseEntity<ApiResponse<String>> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
+        return userService.changePassword(changePasswordRequest);
     }
 }

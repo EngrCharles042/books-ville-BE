@@ -13,6 +13,5 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class BookFilterRequest {
     private Genre genre;
-
     private Integer rating;
 }
