@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/search/title-or-author-or-price-or-genre")
-    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> bookSearchWithKeyword (@RequestParam("query")String query) {
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> bookSearchWithKeyword(@RequestParam("query") String query) {
         return userService.searchBooks(query);
     }
 
@@ -67,5 +67,14 @@ public class UserController {
     @PatchMapping("change-password")
     public ResponseEntity<ApiResponse<String>> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         return userService.changePassword(changePasswordRequest);
+    }
+
+    @GetMapping("/purchased-history")
+    public ResponseEntity<ApiResponse<PurchasedHistoryPage>> getPurchasedHistory(
+            @RequestParam(value = "PageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
+            @RequestParam(value = "PageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int PageSize) {
+
+        return ResponseEntity.ok().body
+                (new ApiResponse<>("Success", userService.getPurchasedHistory(pageNo, PageSize)));
     }
 }
