@@ -7,6 +7,7 @@ import booksville.payload.request.UserEntityRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.BookEntityResponse;
 import booksville.payload.response.BookResponsePage;
+import booksville.payload.response.PurchasedHistoryPage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,4 +23,5 @@ public interface UserService {
     ResponseEntity<ApiResponse<String>> userInfoUpdate(UserEntityRequest userEntityRequest);
     ResponseEntity<ApiResponse<String>> profilePicUpdate(MultipartFile multipartFile) throws IOException;
     ResponseEntity<ApiResponse<String>> changePassword(ChangePasswordRequest changePasswordRequest);
+    PurchasedHistoryPage getPurchasedHistory(int pageNo, int pageSize);
 }
