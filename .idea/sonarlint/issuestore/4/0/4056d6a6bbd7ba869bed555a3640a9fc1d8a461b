@@ -1,12 +1,16 @@
 
-l
-java:S1192€"PDefine a constant instead of duplicating this literal " does not exist" 3 times.(Ê„ë·úÿÿÿÿ
-j
-java:S1192€"NDefine a constant instead of duplicating this literal "Book with id " 5 times.(Ê„ë·úÿÿÿÿ
+s
+java:S1192ƒ"PDefine a constant instead of duplicating this literal " does not exist" 3 times.(Ê„ë·úÿÿÿÿ8ˆñƒØ1
+q
+java:S1192ƒ"NDefine a constant instead of duplicating this literal "Book with id " 5 times.(Ê„ë·úÿÿÿÿ8‰ñƒØ1
 e
-java:S1192s"HDefine a constant instead of duplicating this literal "success" 3 times.(µ¯ÿà8Åú¾ÿ×1
-l	java:S117ú"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(½†÷õùÿÿÿÿ
-\
-java:S1854{"ARemove this useless assignment to local variable "existingAdmin".(ĞêÈ¦øÿÿÿÿ
-M
-java:S1481{"2Remove this unused "existingAdmin" local variable.(ĞêÈ¦øÿÿÿÿ
+java:S1192v"HDefine a constant instead of duplicating this literal "success" 3 times.(µ¯ÿà8ŠñƒØ1
+s	java:S117Œ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(½†÷õùÿÿÿÿ8ñƒØ1
+c
+java:S1854~"ARemove this useless assignment to local variable "existingAdmin".(ĞêÈ¦øÿÿÿÿ8ÙñƒØ1
+T
+java:S1481~"2Remove this unused "existingAdmin" local variable.(ĞêÈ¦øÿÿÿÿ8ÚñƒØ1
+N
+java:S1128"1Remove this unused import 'java.math.BigDecimal'.(êêŠ8Œ‘ñƒØ1
+V
+java:S1128 "4Remove this unused import 'java.time.LocalDateTime'.(æÃ§ƒüÿÿÿÿ8Œ‘ñƒØ1

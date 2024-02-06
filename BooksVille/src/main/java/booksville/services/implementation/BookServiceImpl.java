@@ -25,8 +25,11 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -189,6 +192,17 @@ public class BookServiceImpl implements BookService {
 
         UserEntity userEntity = getCurrentUserFromToken();
 
+        Optional<SavedBooksEntity> savedBooksEntity = savedBooksEntityRepository
+                .findByUserEntityAndBookEntity(userEntity, book);
+
+        if (savedBooksEntity.isPresent()) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponse<>(
+                            "alreadySaved"
+                    )
+            );
+        }
+
         savedBooksEntityRepository.save(
                 SavedBooksEntity.builder()
                         .bookEntity(book)
@@ -207,6 +221,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ApiResponse<BookResponsePage>> getSavedBooks(int pageNo, int pageSize, String sortBy, String sortDir) {
         // Sort condition
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
@@ -222,20 +237,23 @@ public class BookServiceImpl implements BookService {
 
         List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
                 .map(bookEntityResponse -> modelMapper
-                        .map(bookEntityResponse.getBookEntity(), BookEntityResponse.class))
+                        .map(bookEntityResponse.getBookEntity(), BookEntityResponse.class)
+                )
                 .toList();
+
+        BookResponsePage bookResponsePage = BookResponsePage.builder()
+                .content(bookEntityResponses)
+                .pageNo(savedBooksEntitiesPage.getNumber())
+                .pageSize(savedBooksEntitiesPage.getSize())
+                .totalElements(savedBooksEntitiesPage.getTotalElements())
+                .totalPages(savedBooksEntitiesPage.getTotalPages())
+                .last(savedBooksEntitiesPage.isLast())
+                .build();
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         "Success",
-                        BookResponsePage.builder()
-                                .content(bookEntityResponses)
-                                .pageNo(savedBooksEntitiesPage.getNumber())
-                                .pageSize(savedBooksEntitiesPage.getSize())
-                                .totalElements(savedBooksEntitiesPage.getTotalElements())
-                                .totalPages(savedBooksEntitiesPage.getTotalPages())
-                                .last(savedBooksEntitiesPage.isLast())
-                                .build()
+                        bookResponsePage
                 )
         );
     }
@@ -276,6 +294,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ApiResponse<BookResponsePage>> getPurchasedBooks(int pageNo, int pageSize, String sortBy, String sortDir) {
         UserEntity userEntity = getCurrentUserFromToken();
 
@@ -293,8 +312,8 @@ public class BookServiceImpl implements BookService {
 
         List<BookEntityResponse> bookEntityResponses = purchasedBookEntities.stream()
                 .map(transactionEntity -> modelMapper
-                        .map(transactionEntity.getBookEntity(), BookEntityResponse.class))
-                .toList();
+                        .map(transactionEntity.getBookEntity(), BookEntityResponse.class)
+                ).toList();
 
         BookResponsePage bookResponsePage = BookResponsePage.builder()
                 .content(bookEntityResponses)

@@ -2,6 +2,7 @@ package booksville.utils;
 
 import booksville.entities.model.UserEntity;
 import booksville.infrastructure.exceptions.ApplicationException;
+import booksville.infrastructure.security.JWTGenerator;
 import booksville.repositories.UserEntityRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -22,7 +23,10 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class HelperClass {
+
     private final UserEntityRepository userEntityRepository;
+    private final HttpServletRequest request;
+    private final JWTGenerator jwtGenerator;
 
     public void sendEmail(
             String firstName,
@@ -160,5 +164,15 @@ public class HelperClass {
         }
 
         return null;
+    }
+
+    public UserEntity getUserEntity() {
+        String token = getTokenFromHttpRequest(request);
+
+        String email = jwtGenerator.getEmailFromJWT(token);
+
+        return  userEntityRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("User does not exist with email " + email));
     }
 }

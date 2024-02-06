@@ -67,7 +67,7 @@ public class BookController {
         return bookService.getSavedBooks(pageNo, pageSize, sortBy, sortDir);
     }
 
-    @PostMapping("/save/{id}")
+    @GetMapping("/save/{id}")
     public ResponseEntity<ApiResponse<String>> saveBook(@PathVariable Long id) {
         return bookService.saveBook(id);
     }
