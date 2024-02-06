@@ -73,12 +73,22 @@ public class BookController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity<?> downloadBooks(@RequestParam("book_id") Long book_Id) {
-        byte[] bookData = bookService.downloadBook(book_Id);
+    public ResponseEntity<?> downloadBooks(@RequestParam("book_id") Long bookId) {
+        byte[] bookData = bookService.downloadBook(bookId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(bookData);
+    }
+
+    @GetMapping("purchased")
+    public ResponseEntity<ApiResponse<BookResponsePage>> getAllPurchasedBooks(
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
+
+        return bookService.getPurchasedBooks(pageNo, pageSize, sortBy, sortDir);
     }
 }
