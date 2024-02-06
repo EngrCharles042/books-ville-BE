@@ -148,6 +148,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest) {
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(loginRequest.getEmail());
+        if (userEntityOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ApiResponse<>("user not found")
+            );
+        }
 
         // Authentication manager to authenticate user
         Authentication authentication = authenticationManager.authenticate(
@@ -157,7 +163,6 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
-        Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(loginRequest.getEmail());
 
 
         if (userEntityOptional.isPresent() && !userEntityOptional.get().isVerified()) {
