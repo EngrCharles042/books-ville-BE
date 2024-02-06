@@ -29,3 +29,7 @@ r
 BBooksVille/src/main/java/booksville/entities/model/BaseEntity.java,9/4/949c235395318512ae7eb5588d663b44eb30fa59
 ‰
 YBooksVille/src/main/java/booksville/infrastructure/exceptions/GlobalExceptionHandler.java,b/d/bd4fbbb9756f44dee46994a9082e6812131274f7
+9
+	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+…
+UBooksVille/src/main/java/booksville/infrastructure/configurations/SecurityConfig.java,8/3/830c0a5fbfbddad83369f6c0f4c68549a773a987
