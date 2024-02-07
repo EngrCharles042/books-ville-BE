@@ -151,6 +151,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ApiResponse<String>> deleteBook(Long bookId) {
         Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookId);
 
@@ -196,7 +197,7 @@ public class BookServiceImpl implements BookService {
                 .findByUserEntityAndBookEntity(userEntity, book);
 
         if (savedBooksEntity.isPresent()) {
-            return ResponseEntity.badRequest().body(
+            return ResponseEntity.ok().body(
                     new ApiResponse<>(
                             "alreadySaved"
                     )
@@ -218,6 +219,33 @@ public class BookServiceImpl implements BookService {
                                 "success"
                         )
                 );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> removeSavedBook(Long id) {
+        UserEntity userEntity = helperClass.getUserEntity();
+
+        BookEntity bookEntity = bookRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new ApplicationException("Book not found with id" + id)
+                );
+
+        savedBooksEntityRepository.delete(
+                savedBooksEntityRepository
+                        .findByUserEntityAndBookEntity(userEntity, bookEntity)
+                        .orElseThrow(
+                                () -> new ApplicationException("saved book not found")
+                        )
+        );
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "removed",
+                        "Saved book successfully removed"
+                )
+        );
     }
 
     @Override

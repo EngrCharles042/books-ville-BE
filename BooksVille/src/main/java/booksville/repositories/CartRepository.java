@@ -5,7 +5,9 @@ import booksville.entities.model.CartEntity;
 import booksville.entities.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface CartRepository extends JpaRepository<CartEntity, Long> {
-    CartEntity findByUserEntityAndBookEntity(UserEntity user, BookEntity book);
+    Optional<CartEntity> findByUserEntityAndBookEntity(UserEntity user, BookEntity book);
     void deleteByUserEntityAndBookEntity(UserEntity user, BookEntity book);
 }

@@ -72,6 +72,11 @@ public class BookController {
         return bookService.saveBook(id);
     }
 
+    @DeleteMapping("/save/remove/{id}")
+    public ResponseEntity<ApiResponse<String>> removeSavedBook(@PathVariable Long id) {
+        return bookService.removeSavedBook(id);
+    }
+
     @GetMapping("/download")
     public ResponseEntity<?> downloadBooks(@RequestParam("book_id") Long bookId) {
         byte[] bookData = bookService.downloadBook(bookId);

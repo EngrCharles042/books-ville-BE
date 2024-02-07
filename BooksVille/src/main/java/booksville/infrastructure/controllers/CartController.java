@@ -15,14 +15,14 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/addToCart")
-    public ResponseEntity<ApiResponse<String>> addToCart(@RequestParam Long bookId) {
+    public ResponseEntity<ApiResponse<String>> addToCart(@RequestParam Long id) {
 
-        return cartService.addToCart(bookId);
+        return cartService.addToCart(id);
     }
 
     @DeleteMapping("/removeFromCart")
-    public ResponseEntity<ApiResponse<String>> removeFromCart(@RequestParam Long bookId) {
+    public ResponseEntity<ApiResponse<String>> removeFromCart(@RequestParam Long id) {
 
-        return cartService.removeFromCart(bookId);
+        return cartService.removeFromCart(id);
     }
 }

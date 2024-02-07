@@ -17,6 +17,7 @@ public interface BookService {
     ResponseEntity<ApiResponse<String>> hideBook(Long bookId);
     ResponseEntity<ApiResponse<BookResponsePage>> getSavedBooks(int pageNo, int pageSize, String sortBy, String sortDir);
     ResponseEntity<ApiResponse<String>> saveBook(Long id);
+    ResponseEntity<ApiResponse<String>> removeSavedBook(Long id);
     byte[] downloadBook (Long bookId);
     ResponseEntity<ApiResponse<BookResponsePage>> getPurchasedBooks(int pageNo, int pageSize, String sortBy, String sortDir);
 }

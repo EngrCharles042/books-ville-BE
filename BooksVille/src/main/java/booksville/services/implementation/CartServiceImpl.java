@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -30,9 +32,9 @@ public class CartServiceImpl implements CartService {
         BookEntity book = bookRepository.findById(bookId)
                 .orElseThrow(()-> new IllegalArgumentException("Book not found"));
 
-        CartEntity existingCartItem = cartRepository.findByUserEntityAndBookEntity(user, book);
+        Optional<CartEntity> existingCartItem = cartRepository.findByUserEntityAndBookEntity(user, book);
 
-        if (existingCartItem != null) {
+        if (existingCartItem.isPresent()) {
 
             return ResponseEntity.ok(
                     new ApiResponse<>(
@@ -66,9 +68,9 @@ public class CartServiceImpl implements CartService {
         BookEntity book = bookRepository.findById(bookId)
                 .orElseThrow(()-> new IllegalArgumentException("Book not found"));
 
-        CartEntity checkCart = cartRepository.findByUserEntityAndBookEntity(user, book);
+        Optional<CartEntity> checkCart = cartRepository.findByUserEntityAndBookEntity(user, book);
 
-        if (checkCart == null){
+        if (checkCart.isEmpty()){
             throw new IllegalArgumentException("No book in cart");
         }
 
