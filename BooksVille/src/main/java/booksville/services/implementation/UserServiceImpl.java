@@ -1,7 +1,6 @@
 package booksville.services.implementation;
 
 import booksville.entities.model.BookEntity;
-import booksville.entities.model.PurchasedBook;
 import booksville.entities.model.UserEntity;
 import booksville.infrastructure.exceptions.ApplicationException;
 import booksville.infrastructure.security.JWTGenerator;
@@ -10,7 +9,6 @@ import booksville.payload.request.ChangePasswordRequest;
 import booksville.payload.request.UserEntityRequest;
 import booksville.payload.response.*;
 import booksville.repositories.BookRepository;
-import booksville.repositories.PurchasedRepository;
 import booksville.repositories.UserEntityRepository;
 import booksville.services.FileUpload;
 import booksville.services.UserService;
@@ -44,8 +42,6 @@ public class UserServiceImpl implements UserService {
     private final HttpServletRequest request;
     private final JWTGenerator jwtGenerator;
     private final FileUpload fileUpload;
-    private final PurchasedRepository purchasedRepository;
-
 
     @Override
     public UserEntity getUserEntity() {
@@ -177,34 +173,5 @@ public class UserServiceImpl implements UserService {
                                 "Password Changed Successfully"
                         )
                 );
-    }
-
-    @Override
-    public PurchasedHistoryPage getPurchasedHistory(int pageNo, int pageSize) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (pageSize < 1) {
-            pageSize = 1;
-        }
-
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Slice<PurchasedBook> purchasedList = purchasedRepository.findAllByUserEntity_EmailPurchasedByDateCreated(email, pageable);
-
-        return PurchasedHistoryPage.builder()
-                .pageNo(purchasedList.getNumber())
-                .pageSize(purchasedList.getSize())
-                .last(purchasedList.isLast())
-                .purchasedResponseList(purchasedList.stream().map(purchasedBook -> UserPurchasedResponse.builder()
-                        .id(purchasedBook.getId())
-                        .dateCreated(purchasedBook.getDateCreated())
-                        .author(purchasedBook.getAuthor())
-                        .bookTitle(purchasedBook.getBookTitle())
-                        .genre(purchasedBook.getGenre())
-                        .description(purchasedBook.getDescription())
-                        .price(purchasedBook.getPrice())
-                        .bookCover(purchasedBook.getBookCover())
-                        .build()).toList())
-                .build();
-
     }
 }

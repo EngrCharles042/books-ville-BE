@@ -68,13 +68,4 @@ public class UserController {
     public ResponseEntity<ApiResponse<String>> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         return userService.changePassword(changePasswordRequest);
     }
-
-    @GetMapping("/purchased-history")
-    public ResponseEntity<ApiResponse<PurchasedHistoryPage>> getPurchasedHistory(
-            @RequestParam(value = "PageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
-            @RequestParam(value = "PageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int PageSize) {
-
-        return ResponseEntity.ok().body
-                (new ApiResponse<>("Success", userService.getPurchasedHistory(pageNo, PageSize)));
-    }
 }

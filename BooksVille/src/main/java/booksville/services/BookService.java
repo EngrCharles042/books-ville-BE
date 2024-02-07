@@ -12,11 +12,11 @@ public interface BookService {
     ResponseEntity<ApiResponse<BookEntityResponse>> findById(Long id);
     ResponseEntity<ApiResponse<BookResponsePage>> getAllBooks(int pageNo, int pageSize, String sortBy, String sortDir);
     ResponseEntity<ApiResponse<BookEntityResponse>> addBook(BookEntityRequest bookEntityRequest) throws IOException;
-//    byte[] downloadImage(Long id);
     ResponseEntity<ApiResponse<BookEntityResponse>> editBook(BookEntityRequest bookEntityRequest, Long bookEntityId);
     ResponseEntity<ApiResponse<String>> deleteBook(Long bookId);
     ResponseEntity<ApiResponse<String>> hideBook(Long bookId);
     ResponseEntity<ApiResponse<BookResponsePage>> getSavedBooks(int pageNo, int pageSize, String sortBy, String sortDir);
     ResponseEntity<ApiResponse<String>> saveBook(Long id);
-    byte[] downloadBook (Long book_Id);
+    byte[] downloadBook (Long bookId);
+    ResponseEntity<ApiResponse<BookResponsePage>> getPurchasedBooks(int pageNo, int pageSize, String sortBy, String sortDir);
 }

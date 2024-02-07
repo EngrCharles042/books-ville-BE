@@ -149,6 +149,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest) {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(loginRequest.getEmail());
+
         if (userEntityOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ApiResponse<>("user not found")
@@ -165,16 +166,11 @@ public class AuthServiceImpl implements AuthService {
 
 
 
-        if (userEntityOptional.isPresent() && !userEntityOptional.get().isVerified()) {
+        if (!userEntityOptional.get().isVerified()) {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ApiResponse<>("notVerified")
             );
         }
-
-        // Saving authentication in security context so user won't have to login everytime the network is called
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(authentication);
 
         // Generate jwt token
         String token = jwtGenerator.generateToken(authentication, SecurityConstants.JWT_EXPIRATION);
@@ -182,25 +178,32 @@ public class AuthServiceImpl implements AuthService {
         // Generate jwt refresh token
         String refreshToken = jwtGenerator.generateToken(authentication, SecurityConstants.JWT_REFRESH_TOKEN_EXPIRATION);
 
+        // Saving authentication in security context so user won't have to login everytime the network is called
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(authentication);
+
         UserEntity userEntity = userEntityOptional.get();
+
+        JwtAuthResponse authResponse = JwtAuthResponse.builder()
+                .accessToken(token)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .id(userEntity.getId())
+                .profilePicture(userEntity.getProfilePicture())
+                .email(userEntity.getEmail())
+                .phoneNumber(userEntity.getPhoneNumber())
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName())
+                .role(userEntity.getRoles())
+                .build();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(
                         new ApiResponse<>(
                                 "Login Successful",
-                                JwtAuthResponse.builder()
-                                        .accessToken(token)
-                                        .refreshToken(refreshToken)
-                                        .tokenType("Bearer")
-                                        .id(userEntity.getId())
-                                        .profilePicture(userEntity.getProfilePicture())
-                                        .email(userEntity.getEmail())
-                                        .phoneNumber(userEntity.getPhoneNumber())
-                                        .firstName(userEntity.getFirstName())
-                                        .lastName(userEntity.getLastName())
-                                        .role(userEntity.getRoles())
-                                        .build()
+                                authResponse
                         )
                 );
         }

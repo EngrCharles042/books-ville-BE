@@ -118,13 +118,6 @@ public class BookServiceImpl implements BookService {
                 );
     }
 
-//    @Override
-//    public byte[] downloadImage(Long id) {
-//        Optional<BookEntity> dbFileData = bookRepository.findById(id);
-//
-//        return FileUtils.decompressImage(dbFileData.get().getBookData());
-//    }
-
     @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> editBook(BookEntityRequest bookEntityRequest, Long bookEntityId) {
         UserEntity existingAdmin = getCurrentUserFromToken();
@@ -275,13 +268,48 @@ public class BookServiceImpl implements BookService {
         if(transactions.isPresent()){
             BookEntity book = transactions.get().getBookEntity();
 
-
-            byte[] bookFile = FileUtils.decompressImage(book.getBookData());
-
-            return bookFile;
+            return FileUtils.decompressImage(book.getBookData());
 
         } else {
             throw new ApplicationException("No completed transaction found. Please make a payment to download the book.");
         }
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<BookResponsePage>> getPurchasedBooks(int pageNo, int pageSize, String sortBy, String sortDir) {
+        UserEntity userEntity = getCurrentUserFromToken();
+
+        // Sort condition
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<TransactionEntity> transactionEntitiesPage = transactionEntityRepository
+                .findAllByUserEntity(userEntity, pageable);
+
+        List<TransactionEntity> purchasedBookEntities = transactionEntitiesPage.getContent();
+
+        List<BookEntityResponse> bookEntityResponses = purchasedBookEntities.stream()
+                .map(transactionEntity -> modelMapper
+                        .map(transactionEntity.getBookEntity(), BookEntityResponse.class))
+                .toList();
+
+        BookResponsePage bookResponsePage = BookResponsePage.builder()
+                .content(bookEntityResponses)
+                .pageNo(transactionEntitiesPage.getNumber())
+                .pageSize(transactionEntitiesPage.getSize())
+                .totalElements(transactionEntitiesPage.getTotalElements())
+                .totalPages(transactionEntitiesPage.getTotalPages())
+                .last(transactionEntitiesPage.isLast())
+                .build();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookResponsePage
+                )
+        );
     }
 }
