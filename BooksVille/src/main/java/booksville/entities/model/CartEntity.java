@@ -12,13 +12,13 @@ import lombok.*;
 @Table(name = "cart")
 public class CartEntity extends BaseEntity{
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private UserEntity userEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "book_id")
-    private BookEntity book;
-
-    private Long quantity;
+    private BookEntity bookEntity;
 }

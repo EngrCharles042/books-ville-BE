@@ -1,8 +1,0 @@
-
-C
-java:S5411o"(Use a primitive boolean expression here.(Èëååüÿÿÿÿ
-o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(‡‡ÿë
-€
-java:S3655ñ"dCall "userEntityOptional.isPresent()" or "!userEntityOptional.isEmpty()" before accessing the value.(‰õ…ßøÿÿÿÿ
-€
-java:S3655´"dCall "userEntityOptional.isPresent()" or "!userEntityOptional.isEmpty()" before accessing the value.(‰õ…ßøÿÿÿÿ

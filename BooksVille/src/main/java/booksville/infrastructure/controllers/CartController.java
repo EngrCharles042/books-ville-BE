@@ -15,21 +15,14 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/addToCart")
-    public ResponseEntity<ApiResponse<String>> addToCart(@RequestParam Long userId,
-                                                         @RequestParam Long bookId,
-                                                         @RequestParam Long quantity){
-        cartService.addToCart(userId, bookId, quantity);
+    public ResponseEntity<ApiResponse<String>> addToCart(@RequestParam Long id) {
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>("Book added to cart successful", "Book Added"));
+        return cartService.addToCart(id);
     }
 
     @DeleteMapping("/removeFromCart")
-    public ResponseEntity<ApiResponse<String>> removeFromCart(@RequestParam Long userId,
-                                                              @RequestParam Long bookId){
-        cartService.removeFromCart(userId, bookId);
+    public ResponseEntity<ApiResponse<String>> removeFromCart(@RequestParam Long id) {
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<>("Book removed from cart successful", "Book Removed"));
+        return cartService.removeFromCart(id);
     }
 }

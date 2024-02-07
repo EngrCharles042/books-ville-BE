@@ -40,4 +40,7 @@ public class UserEntity extends BaseEntity{
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
     private List<SavedBooksEntity> savedBooksEntities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    private List<CartEntity> cartEntities = new ArrayList<>();
 }
