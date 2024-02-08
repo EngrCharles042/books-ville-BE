@@ -68,12 +68,12 @@ public class BookController {
     }
 
     @GetMapping("/save/{id}")
-    public ResponseEntity<ApiResponse<String>> saveBook(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> saveBook(@PathVariable("id") Long id) {
         return bookService.saveBook(id);
     }
 
     @DeleteMapping("/save/remove/{id}")
-    public ResponseEntity<ApiResponse<String>> removeSavedBook(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> removeSavedBook(@PathVariable("id") Long id) {
         return bookService.removeSavedBook(id);
     }
 

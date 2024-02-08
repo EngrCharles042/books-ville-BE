@@ -4,16 +4,18 @@ import booksville.entities.model.BookEntity;
 import booksville.entities.model.CartEntity;
 import booksville.entities.model.UserEntity;
 import booksville.payload.response.ApiResponse;
+import booksville.payload.response.BookEntityResponse;
 import booksville.repositories.BookRepository;
 import booksville.repositories.CartRepository;
-import booksville.repositories.UserEntityRepository;
 import booksville.services.CartService;
 import booksville.utils.HelperClass;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +25,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final BookRepository bookRepository;
     private final HelperClass helperClass;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional
@@ -81,5 +84,27 @@ public class CartServiceImpl implements CartService {
                         "success"
                 )
         );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> getCart() {
+        UserEntity userEntity = helperClass.getUserEntity();
+
+        List<BookEntityResponse> bookEntityResponses = cartRepository
+                .findCartEntitiesByUserEntity(userEntity)
+                .stream()
+                .map(
+                        cartEntity -> modelMapper
+                                .map(cartEntity.getBookEntity(), BookEntityResponse.class)
+                ).toList();
+
+        return ResponseEntity.ok()
+                .body(
+                        new ApiResponse<>(
+                                "success",
+                                bookEntityResponses
+                        )
+                );
     }
 }
