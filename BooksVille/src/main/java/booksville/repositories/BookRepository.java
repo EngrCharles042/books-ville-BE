@@ -27,6 +27,10 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
 
     Page<BookEntity> findBookEntitiesByGenreContainingAndRating(Genre genre, Integer rating, Pageable pageable);
 
-
-
+    @Query(value = """
+            select b from BookEntity b
+            where upper(b.author) like upper(concat('%', :query, '%')) 
+            or upper(b.bookTitle) like upper(concat('%', :query, '%')) 
+            or upper(b.genre) like upper(concat('%', :query, '%'))""", nativeQuery = true)
+    Page<BookEntity> searchUsingAuthorOrTitleOrGenre (@Param("query") String query, Pageable pageable);
 }

@@ -20,4 +20,5 @@ public interface BookService {
     ResponseEntity<ApiResponse<String>> removeSavedBook(Long id);
     byte[] downloadBook (Long bookId);
     ResponseEntity<ApiResponse<BookResponsePage>> getPurchasedBooks(int pageNo, int pageSize, String sortBy, String sortDir);
+    ResponseEntity<ApiResponse<BookResponsePage>> searchUsingAuthorOrTitleOrGenre(int pageNo, int pageSize, String sortBy, String sortDir, String search);
 }

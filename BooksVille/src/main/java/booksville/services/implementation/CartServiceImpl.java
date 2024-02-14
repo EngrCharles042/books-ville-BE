@@ -26,6 +26,7 @@ public class CartServiceImpl implements CartService {
     private final BookRepository bookRepository;
     private final HelperClass helperClass;
     private final ModelMapper modelMapper;
+    private static final String SUCCESS = "success";
 
     @Override
     @Transactional
@@ -57,7 +58,7 @@ public class CartServiceImpl implements CartService {
 
             return ResponseEntity.ok(
                     new ApiResponse<>(
-                            "success"
+                            SUCCESS
                     )
             );
         }
@@ -81,7 +82,7 @@ public class CartServiceImpl implements CartService {
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
-                        "success"
+                        SUCCESS
                 )
         );
     }
@@ -102,7 +103,7 @@ public class CartServiceImpl implements CartService {
         return ResponseEntity.ok()
                 .body(
                         new ApiResponse<>(
-                                "success",
+                                SUCCESS,
                                 bookEntityResponses
                         )
                 );
