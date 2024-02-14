@@ -359,4 +359,39 @@ public class BookServiceImpl implements BookService {
                 )
         );
     }
+
+    @Override
+    public ResponseEntity<ApiResponse<BookResponsePage>> searchUsingAuthorOrTitleOrGenre(int pageNo, int pageSize, String sortBy, String sortDir, String search) {
+        // Sort condition
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<BookEntity> bookEntitiesPage = bookRepository.searchUsingAuthorOrTitleOrGenre(search, pageable);
+
+        List<BookEntity> bookEntities = bookEntitiesPage.getContent();
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(bookEntity -> modelMapper
+                        .map(bookEntity, BookEntityResponse.class)
+                ).toList();
+
+        BookResponsePage bookResponsePage = BookResponsePage.builder()
+                .content(bookEntityResponses)
+                .pageNo(bookEntitiesPage.getNumber())
+                .pageSize(bookEntitiesPage.getSize())
+                .totalElements(bookEntitiesPage.getTotalElements())
+                .totalPages(bookEntitiesPage.getTotalPages())
+                .last(bookEntitiesPage.isLast())
+                .build();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookResponsePage
+                )
+        );
+    }
 }
