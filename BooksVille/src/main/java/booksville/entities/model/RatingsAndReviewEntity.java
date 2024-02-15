@@ -12,6 +12,7 @@ import lombok.*;
 @Table(name = "ratings_table")
 public class RatingsAndReviewEntity extends BaseEntity {
     private Integer rating;
+
     @Column(columnDefinition = "TEXT")
     private String review;
 
