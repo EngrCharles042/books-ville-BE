@@ -21,8 +21,8 @@ import java.io.IOException;
 public class BookController {
     private final BookService bookService;
 
-    @GetMapping("/get-book")
-    public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@RequestParam Long id) {
+    @GetMapping("/get-book/{id}")
+    public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@PathVariable Long id) {
         return bookService.findById(id);
     }
 
