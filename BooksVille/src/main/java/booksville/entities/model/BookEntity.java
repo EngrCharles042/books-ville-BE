@@ -43,5 +43,8 @@ public class BookEntity extends BaseEntity{
     @OneToMany(mappedBy = "bookEntity", cascade = CascadeType.ALL)
     private List<CartEntity> cartEntities = new ArrayList<>();
 
+    @OneToMany(mappedBy = "bookEntity", cascade = CascadeType.ALL)
+    private List<RatingsAndReviewEntity> ratingsAndReviewEntity = new ArrayList<>();
+
     private Integer rating;
 }

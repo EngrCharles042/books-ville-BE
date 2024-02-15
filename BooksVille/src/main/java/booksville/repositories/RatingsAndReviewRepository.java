@@ -1,2 +1,14 @@
-package booksville.repositories;public class RatingsAndReviewRepository {
+package booksville.repositories;
+
+import booksville.entities.model.RatingsAndReviewEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface RatingsAndReviewRepository extends JpaRepository<RatingsAndReviewEntity,Long> {
+
+    List<RatingsAndReviewEntity> findByBookEntityId(Long bookId);
 }

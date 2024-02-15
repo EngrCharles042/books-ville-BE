@@ -1,2 +1,16 @@
-package booksville.payload.response;public class ViewRatingsResponse {
+package booksville.payload.response;
+
+import lombok.*;
+
+import java.time.LocalDateTime;
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ViewRatingsResponse {
+    private Integer rating;
+    private String review;
+    private String email;
+    private LocalDateTime dateCreated;
 }
