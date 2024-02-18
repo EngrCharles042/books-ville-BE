@@ -24,5 +24,7 @@ public interface BookService {
     byte[] downloadBook (Long bookId);
     ResponseEntity<ApiResponse<BookResponsePage>> getPurchasedBooks(int pageNo, int pageSize, String sortBy, String sortDir);
     ResponseEntity<ApiResponse<BookResponsePage>> searchUsingAuthorOrTitleOrGenre(int pageNo, int pageSize, String sortBy, String sortDir, String search);
-    ResponseEntity<ApiResponse<List<BookEntity>>> filterBooksByGenreAndRating(FilterRequest filterRequest);
+    ResponseEntity<ApiResponse<List<BookEntityResponse>>> filterBooksByGenreAndRating(FilterRequest filterRequest);
+    ResponseEntity<ApiResponse<BookResponsePage>> filterByRating(int pageNo, int pageSize, String sortBy, String sortDir, int rating);
+    ResponseEntity<ApiResponse<List<BookEntityResponse>>> findAllBooks();
 }

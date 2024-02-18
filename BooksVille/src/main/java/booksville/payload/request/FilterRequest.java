@@ -15,5 +15,4 @@ public class FilterRequest {
    private String genre5;
    private String genre6;
    private String genre7;
-   private Integer rating;
 }

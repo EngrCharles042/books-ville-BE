@@ -401,22 +401,78 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<List<BookEntity>>> filterBooksByGenreAndRating(FilterRequest filterRequest) {
-        List<BookEntity> bookEntities = bookRepository.findBookEntitiesByGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrRating(
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> filterBooksByGenreAndRating(FilterRequest filterRequest) {
+        List<BookEntity> bookEntities = bookRepository.findBookEntitiesByGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrGenre(
                 filterRequest.getGenre(),
                 filterRequest.getGenre2(),
                 filterRequest.getGenre3(),
                 filterRequest.getGenre4(),
                 filterRequest.getGenre5(),
                 filterRequest.getGenre6(),
-                filterRequest.getGenre7(),
-                filterRequest.getRating()
+                filterRequest.getGenre7()
         );
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(
+                        bookEntity -> modelMapper.map(bookEntity, BookEntityResponse.class)
+                ).toList();
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         "success",
-                        bookEntities
+                        bookEntityResponses
+                )
+        );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<BookResponsePage>> filterByRating(int pageNo, int pageSize, String sortBy, String sortDir, int rating) {
+        // Sort condition
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<BookEntity> bookEntitiesPage = bookRepository.findBookEntitiesByRating(rating, pageable);
+
+        List<BookEntity> bookEntities = bookEntitiesPage.getContent();
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(bookEntity -> modelMapper
+                        .map(bookEntity, BookEntityResponse.class)
+                ).toList();
+
+        BookResponsePage bookResponsePage = BookResponsePage.builder()
+                .content(bookEntityResponses)
+                .pageNo(bookEntitiesPage.getNumber())
+                .pageSize(bookEntitiesPage.getSize())
+                .totalElements(bookEntitiesPage.getTotalElements())
+                .totalPages(bookEntitiesPage.getTotalPages())
+                .last(bookEntitiesPage.isLast())
+                .build();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookResponsePage
+                )
+        );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> findAllBooks() {
+        List<BookEntity> bookEntities = bookRepository.findAll();
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(bookEntity -> modelMapper.map(bookEntity, BookEntityResponse.class))
+                .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookEntityResponses
                 )
         );
     }

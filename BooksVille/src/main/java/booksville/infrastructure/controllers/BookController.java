@@ -28,6 +28,11 @@ import java.util.Objects;
 public class BookController {
     private final BookService bookService;
 
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> findAllBooks () {
+        return bookService.findAllBooks();
+    }
+
     @GetMapping("/get-book/{id}")
     public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@PathVariable Long id) {
         return bookService.findById(id);
@@ -116,14 +121,13 @@ public class BookController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<List<BookEntity>>> filterBooks(@RequestParam(required = false) String genre,
-                                                                     @RequestParam(required = false) String genre2,
-                                                                     @RequestParam(required = false) String genre3,
-                                                                     @RequestParam(required = false) String genre4,
-                                                                     @RequestParam(required = false) String genre5,
-                                                                     @RequestParam(required = false) String genre6,
-                                                                     @RequestParam(required = false) String genre7,
-                                                                     @RequestParam(required = false) Integer rating) {
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> filterBooks(@RequestParam(required = false) String genre,
+                                                                             @RequestParam(required = false) String genre2,
+                                                                             @RequestParam(required = false) String genre3,
+                                                                             @RequestParam(required = false) String genre4,
+                                                                             @RequestParam(required = false) String genre5,
+                                                                             @RequestParam(required = false) String genre6,
+                                                                             @RequestParam(required = false) String genre7) {
 
         FilterRequest filterRequest = FilterRequest.builder()
                 .genre(genre)
@@ -133,9 +137,7 @@ public class BookController {
                 .genre5(genre5)
                 .genre6(genre6)
                 .genre7(genre7)
-                .rating(rating)
                 .build();
-
 
         return bookService.filterBooksByGenreAndRating(filterRequest);
     }
