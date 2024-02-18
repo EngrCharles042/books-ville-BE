@@ -1,6 +1,8 @@
 package booksville.infrastructure.controllers;
 
+import booksville.entities.model.BookEntity;
 import booksville.payload.request.BookEntityRequest;
+import booksville.payload.request.FilterRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.BookEntityResponse;
 import booksville.payload.response.BookResponsePage;
@@ -8,13 +10,18 @@ import booksville.services.BookService;
 import booksville.utils.AppConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/book")
@@ -106,5 +113,30 @@ public class BookController {
             @RequestParam(value = "search") String search) {
 
         return bookService.searchUsingAuthorOrTitleOrGenre(pageNo, pageSize, sortBy, sortDir, search);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponse<List<BookEntity>>> filterBooks(@RequestParam(required = false) String genre,
+                                                                     @RequestParam(required = false) String genre2,
+                                                                     @RequestParam(required = false) String genre3,
+                                                                     @RequestParam(required = false) String genre4,
+                                                                     @RequestParam(required = false) String genre5,
+                                                                     @RequestParam(required = false) String genre6,
+                                                                     @RequestParam(required = false) String genre7,
+                                                                     @RequestParam(required = false) Integer rating) {
+
+        FilterRequest filterRequest = FilterRequest.builder()
+                .genre(genre)
+                .genre2(genre2)
+                .genre3(genre3)
+                .genre4(genre4)
+                .genre5(genre5)
+                .genre6(genre6)
+                .genre7(genre7)
+                .rating(rating)
+                .build();
+
+
+        return bookService.filterBooksByGenreAndRating(filterRequest);
     }
 }

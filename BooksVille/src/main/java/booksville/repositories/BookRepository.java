@@ -33,4 +33,13 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
             or upper(b.bookTitle) like upper(concat('%', :query, '%')) 
             or upper(b.genre) like upper(concat('%', :query, '%'))""", nativeQuery = true)
     Page<BookEntity> searchUsingAuthorOrTitleOrGenre (@Param("query") String query, Pageable pageable);
+
+    List<BookEntity> findBookEntitiesByGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrRating(String genre,
+                                                                                               String genre2,
+                                                                                               String genre3,
+                                                                                               String genre4,
+                                                                                               String genre5,
+                                                                                               String genre6,
+                                                                                               String genre7,
+                                                                                               Integer rating);
 }

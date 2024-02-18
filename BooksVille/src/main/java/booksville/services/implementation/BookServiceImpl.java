@@ -7,6 +7,7 @@ import booksville.entities.model.UserEntity;
 import booksville.infrastructure.exceptions.ApplicationException;
 import booksville.infrastructure.security.JWTGenerator;
 import booksville.payload.request.BookEntityRequest;
+import booksville.payload.request.FilterRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.BookEntityResponse;
 import booksville.payload.response.BookResponsePage;
@@ -20,6 +21,7 @@ import booksville.utils.FileUtils;
 import booksville.utils.HelperClass;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -27,12 +29,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Book;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -391,6 +395,28 @@ public class BookServiceImpl implements BookService {
                 new ApiResponse<>(
                         "success",
                         bookResponsePage
+                )
+        );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<List<BookEntity>>> filterBooksByGenreAndRating(FilterRequest filterRequest) {
+        List<BookEntity> bookEntities = bookRepository.findBookEntitiesByGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrRating(
+                filterRequest.getGenre(),
+                filterRequest.getGenre2(),
+                filterRequest.getGenre3(),
+                filterRequest.getGenre4(),
+                filterRequest.getGenre5(),
+                filterRequest.getGenre6(),
+                filterRequest.getGenre7(),
+                filterRequest.getRating()
+        );
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookEntities
                 )
         );
     }

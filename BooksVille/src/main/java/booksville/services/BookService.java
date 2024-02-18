@@ -1,12 +1,15 @@
 package booksville.services;
 
+import booksville.entities.model.BookEntity;
 import booksville.payload.request.BookEntityRequest;
+import booksville.payload.request.FilterRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.BookEntityResponse;
 import booksville.payload.response.BookResponsePage;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface BookService {
     ResponseEntity<ApiResponse<BookEntityResponse>> findById(Long id);
@@ -21,4 +24,5 @@ public interface BookService {
     byte[] downloadBook (Long bookId);
     ResponseEntity<ApiResponse<BookResponsePage>> getPurchasedBooks(int pageNo, int pageSize, String sortBy, String sortDir);
     ResponseEntity<ApiResponse<BookResponsePage>> searchUsingAuthorOrTitleOrGenre(int pageNo, int pageSize, String sortBy, String sortDir, String search);
+    ResponseEntity<ApiResponse<List<BookEntity>>> filterBooksByGenreAndRating(FilterRequest filterRequest);
 }

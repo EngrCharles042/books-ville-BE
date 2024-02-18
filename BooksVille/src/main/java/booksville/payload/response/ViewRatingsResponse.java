@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class ViewRatingsResponse {
     private Integer rating;
     private String review;
-    private String email;
+    private String firstName;
+    private String lastName;
     private LocalDateTime dateCreated;
 }
