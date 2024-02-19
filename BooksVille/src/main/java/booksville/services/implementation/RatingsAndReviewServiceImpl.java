@@ -4,17 +4,15 @@ import booksville.entities.model.BookEntity;
 import booksville.entities.model.RatingsAndReviewEntity;
 import booksville.entities.model.UserEntity;
 import booksville.infrastructure.exceptions.ApplicationException;
-import booksville.infrastructure.security.JWTGenerator;
 import booksville.payload.request.RatingsAndReviewRequest;
-import booksville.payload.response.*;
-import booksville.repositories.BookEntityRepository;
+import booksville.payload.response.ApiResponse;
+import booksville.payload.response.RatingResponsePage;
+import booksville.payload.response.ViewRatingsResponse;
+import booksville.repositories.BookRepository;
 import booksville.repositories.RatingsAndReviewRepository;
-import booksville.repositories.UserEntityRepository;
 import booksville.services.RatingAndReviewService;
 import booksville.utils.HelperClass;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RatingsAndReviewServiceImpl implements RatingAndReviewService {
     private final RatingsAndReviewRepository ratingsAndReviewRepository;
-    private final BookEntityRepository bookEntityRepository;
+    private final BookRepository bookEntityRepository;
     private final HelperClass helperClass;
 
     @Override

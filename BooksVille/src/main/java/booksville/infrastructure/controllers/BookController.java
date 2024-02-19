@@ -1,6 +1,5 @@
 package booksville.infrastructure.controllers;
 
-import booksville.entities.model.BookEntity;
 import booksville.payload.request.BookEntityRequest;
 import booksville.payload.request.FilterRequest;
 import booksville.payload.response.ApiResponse;
@@ -11,7 +10,6 @@ import booksville.utils.AppConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @RestController
