@@ -171,13 +171,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<String>> hideBook(Long bookId) {
+    public ResponseEntity<ApiResponse<String>> toggleHideBook(Long bookId) {
         Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookId);
         if(optionalBookEntity.isEmpty()){
             throw new ApplicationException("Book with id " +bookId+ " does not exist");
         }
         BookEntity existingBook = optionalBookEntity.get();
-        existingBook.setHidden(true);
+        existingBook.setHidden(!existingBook.getHidden());
         bookRepository.save(existingBook);
 
         return ResponseEntity.ok(new ApiResponse<>("Book with id " + bookId + " is now hidden"));
