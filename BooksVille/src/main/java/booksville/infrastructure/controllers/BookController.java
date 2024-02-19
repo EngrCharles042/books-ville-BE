@@ -53,8 +53,8 @@ public class BookController {
     }
 
     @PatchMapping("/hide/{bookId}")
-    public ResponseEntity<ApiResponse<String>> hideBook(@PathVariable("bookId")Long bookId){
-        return bookService.hideBook(bookId);
+    public ResponseEntity<ApiResponse<String>> hideBook(@PathVariable("bookId") Long bookId){
+        return bookService.toggleHideBook(bookId);
     }
 
     @GetMapping("/saved-books")

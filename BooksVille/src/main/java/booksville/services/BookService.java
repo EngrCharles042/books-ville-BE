@@ -14,7 +14,7 @@ public interface BookService {
     ResponseEntity<ApiResponse<BookEntityResponse>> addBook(BookEntityRequest bookEntityRequest) throws IOException;
     ResponseEntity<ApiResponse<BookEntityResponse>> editBook(BookEntityRequest bookEntityRequest, Long bookEntityId);
     ResponseEntity<ApiResponse<String>> deleteBook(Long bookId);
-    ResponseEntity<ApiResponse<String>> hideBook(Long bookId);
+    ResponseEntity<ApiResponse<String>> toggleHideBook(Long bookId);
     ResponseEntity<ApiResponse<BookResponsePage>> getSavedBooks(int pageNo, int pageSize, String sortBy, String sortDir);
     ResponseEntity<ApiResponse<String>> saveBook(Long id);
     ResponseEntity<ApiResponse<String>> removeSavedBook(Long id);
