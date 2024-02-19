@@ -4,42 +4,54 @@ import booksville.entities.model.BookEntity;
 import booksville.entities.model.RatingsAndReviewEntity;
 import booksville.entities.model.UserEntity;
 import booksville.infrastructure.exceptions.ApplicationException;
-import booksville.infrastructure.security.JWTGenerator;
 import booksville.payload.request.RatingsAndReviewRequest;
 import booksville.payload.response.ApiResponse;
+import booksville.payload.response.RatingResponsePage;
 import booksville.payload.response.ViewRatingsResponse;
-import booksville.repositories.BookEntityRepository;
+import booksville.repositories.BookRepository;
 import booksville.repositories.RatingsAndReviewRepository;
-import booksville.repositories.UserEntityRepository;
 import booksville.services.RatingAndReviewService;
 import booksville.utils.HelperClass;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RatingsAndReviewServiceImpl implements RatingAndReviewService {
     private final RatingsAndReviewRepository ratingsAndReviewRepository;
-    private final BookEntityRepository bookEntityRepository;
-    private final UserEntityRepository userEntityRepository;
+    private final BookRepository bookEntityRepository;
     private final HelperClass helperClass;
-    private final HttpServletRequest httpServletRequest;
-    private final JWTGenerator jwtGenerator;
-
 
     @Override
     public ResponseEntity<ApiResponse<String>> addRatingAndReview(Long bookId, RatingsAndReviewRequest ratingsAndReviewRequest) {
+        UserEntity userEntity = helperClass.getUserEntity();
+
         BookEntity bookEntity = bookEntityRepository.findById(bookId)
                 .orElseThrow(() -> new ApplicationException("Book with " + bookId + " not found"));
 
-        String email = jwtGenerator.getEmailFromJWT(helperClass.getTokenFromHttpRequest(httpServletRequest));
+        Optional<RatingsAndReviewEntity> rateAndReview = ratingsAndReviewRepository.findByUserEntityAndBookEntity(userEntity, bookEntity);
 
-        UserEntity userEntity = userEntityRepository.findByEmail(email)
-                .orElseThrow(() -> new ApplicationException("User with " + email + " not found"));
+        if (rateAndReview.isPresent()) {
+            RatingsAndReviewEntity ratingsAndReviewOld = rateAndReview.get();
+
+            ratingsAndReviewOld.setRating(ratingsAndReviewRequest.getRating());
+            ratingsAndReviewOld.setReview(ratingsAndReviewRequest.getReview());
+
+            ratingsAndReviewRepository.save(ratingsAndReviewOld);
+
+            return ResponseEntity.ok(
+                    new ApiResponse<>("Your rating has been updated")
+            );
+        }
+
         RatingsAndReviewEntity ratingsAndReviewEntity = RatingsAndReviewEntity
                 .builder()
                 .rating(ratingsAndReviewRequest.getRating())
@@ -49,7 +61,13 @@ public class RatingsAndReviewServiceImpl implements RatingAndReviewService {
                 .build();
 
         ratingsAndReviewRepository.save(ratingsAndReviewEntity);
-        return ResponseEntity.ok(new ApiResponse<>("Your feedback was highly appreciated"));
+
+        bookEntity.setRating(bookEntity.getAverageBookRating());
+        bookEntityRepository.save(bookEntity);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("Your feedback was highly appreciated")
+        );
     }
 
     @Override
@@ -59,9 +77,57 @@ public class RatingsAndReviewServiceImpl implements RatingAndReviewService {
                 .builder()
                 .rating(ratingAndReview.getRating())
                 .review(ratingAndReview.getReview())
-                .email(ratingAndReview.getUserEntity().getEmail())
+                .firstName(ratingAndReview.getUserEntity().getFirstName())
+                .lastName(ratingAndReview.getUserEntity().getLastName())
                 .dateCreated(ratingAndReview.getDateCreated())
                 .build()).toList();
         return ResponseEntity.ok(new ApiResponse<>("successfully retrieved data", viewRatingsResponseList));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<RatingResponsePage>> getAllRatingsForBook(int pageNo, int pageSize, String sortBy, String sortDir, Long bookId) {
+        // Sort condition
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        BookEntity bookEntity = bookEntityRepository
+                .findById(bookId)
+                .orElseThrow(
+                        () -> new ApplicationException("Book not found with id: " + bookId)
+                );
+
+        Page<RatingsAndReviewEntity> ratingsAndReviewEntitiesPage = ratingsAndReviewRepository
+                .findAllByBookEntity(bookEntity, pageable);
+
+        List<RatingsAndReviewEntity> ratingsAndReviewEntities = ratingsAndReviewEntitiesPage.getContent();
+
+        List<ViewRatingsResponse> ratingsEntityResponses = ratingsAndReviewEntities.stream()
+                .map(ratingsAndReviewEntity -> ViewRatingsResponse.builder()
+                        .review(ratingsAndReviewEntity.getReview())
+                        .rating(ratingsAndReviewEntity.getRating())
+                        .firstName(ratingsAndReviewEntity.getUserEntity().getFirstName())
+                        .lastName(ratingsAndReviewEntity.getUserEntity().getLastName())
+                        .dateCreated(ratingsAndReviewEntity.getDateCreated())
+                        .build()
+                ).toList();
+
+        RatingResponsePage ratingResponsePage = RatingResponsePage.builder()
+                .content(ratingsEntityResponses)
+                .pageNo(ratingsAndReviewEntitiesPage.getNumber())
+                .pageSize(ratingsAndReviewEntitiesPage.getSize())
+                .totalElements(ratingsAndReviewEntitiesPage.getTotalElements())
+                .totalPages(ratingsAndReviewEntitiesPage.getTotalPages())
+                .last(ratingsAndReviewEntitiesPage.isLast())
+                .build();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        ratingResponsePage
+                )
+        );
     }
 }
