@@ -373,7 +373,8 @@ public class BookServiceImpl implements BookService {
         // Create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<BookEntity> bookEntitiesPage = bookRepository.searchUsingAuthorOrTitleOrGenre(search, pageable);
+        Page<BookEntity> bookEntitiesPage = bookRepository
+                .findBookEntitiesByAuthorContainingIgnoreCaseOrBookTitleContainingIgnoreCaseOrGenreContainsIgnoreCase(search, search, search, pageable);
 
         List<BookEntity> bookEntities = bookEntitiesPage.getContent();
 
