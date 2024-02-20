@@ -24,4 +24,5 @@ public class BookEntityResponse {
     private String bookCover;
     private Boolean hidden;
     private Integer rating;
+    private Boolean isPurchased;
 }
