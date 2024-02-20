@@ -50,4 +50,7 @@ public class UserEntity extends BaseEntity{
     @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL)
     private SubscriptionEntity subscriptionEntity;
 
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    private List<SuggestionEntity> suggestionEntity = new ArrayList<>();
+
 }
