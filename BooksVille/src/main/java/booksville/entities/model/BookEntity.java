@@ -46,6 +46,19 @@ public class BookEntity extends BaseEntity{
     @OneToOne(mappedBy = "bookEntity", cascade = CascadeType.ALL)
     private SuggestionEntity suggestionEntity;
 
-    private Integer rating;
+    @OneToMany(mappedBy = "bookEntity", cascade = CascadeType.ALL)
+    private List<RatingsAndReviewEntity> ratingsAndReviewEntity = new ArrayList<>();
 
+    private Integer rating = getAverageBookRating();
+
+    @PostLoad
+    private void calculateAverageBookRating() {
+        rating = getAverageBookRating();
+    }
+
+    public int getAverageBookRating() {
+        return ratingsAndReviewEntity.stream()
+                .mapToInt(RatingsAndReviewEntity::getRating)
+                .reduce(0, Integer::sum);
+    }
 }

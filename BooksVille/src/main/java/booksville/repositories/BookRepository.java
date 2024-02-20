@@ -7,11 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
 import java.util.Optional;
 
+@Transactional
 public interface BookRepository extends JpaRepository<BookEntity, Long> {
     Optional<BookEntity> findById(Long id);
     Optional<BookEntity> findByBookTitleAndAuthor(String bookTitle, String author);
@@ -33,4 +35,13 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
             or upper(b.bookTitle) like upper(concat('%', :query, '%')) 
             or upper(b.genre) like upper(concat('%', :query, '%'))""", nativeQuery = true)
     Page<BookEntity> searchUsingAuthorOrTitleOrGenre (@Param("query") String query, Pageable pageable);
+
+    List<BookEntity> findBookEntitiesByGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrGenre(String genre,
+                                                                                       String genre2,
+                                                                                       String genre3,
+                                                                                       String genre4,
+                                                                                       String genre5,
+                                                                                       String genre6,
+                                                                                       String genre7);
+    Page<BookEntity> findBookEntitiesByRating(int rating, Pageable pageable);
 }

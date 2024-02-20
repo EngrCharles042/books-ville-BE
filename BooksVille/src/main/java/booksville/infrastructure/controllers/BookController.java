@@ -1,6 +1,7 @@
 package booksville.infrastructure.controllers;
 
 import booksville.payload.request.BookEntityRequest;
+import booksville.payload.request.FilterRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.BookEntityResponse;
 import booksville.payload.response.BookResponsePage;
@@ -8,21 +9,29 @@ import booksville.services.BookService;
 import booksville.utils.AppConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/book")
 public class BookController {
     private final BookService bookService;
 
-    @GetMapping("/get-book")
-    public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@RequestParam Long id) {
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> findAllBooks () {
+        return bookService.findAllBooks();
+    }
+
+    @GetMapping("/get-book/{id}")
+    public ResponseEntity<ApiResponse<BookEntityResponse>> findById (@PathVariable Long id) {
         return bookService.findById(id);
     }
 
@@ -53,8 +62,8 @@ public class BookController {
     }
 
     @PatchMapping("/hide/{bookId}")
-    public ResponseEntity<ApiResponse<String>> hideBook(@PathVariable("bookId")Long bookId){
-        return bookService.hideBook(bookId);
+    public ResponseEntity<ApiResponse<String>> hideBook(@PathVariable("bookId") Long bookId){
+        return bookService.toggleHideBook(bookId);
     }
 
     @GetMapping("/saved-books")
@@ -106,5 +115,27 @@ public class BookController {
             @RequestParam(value = "search") String search) {
 
         return bookService.searchUsingAuthorOrTitleOrGenre(pageNo, pageSize, sortBy, sortDir, search);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> filterBooks(@RequestParam(required = false) String genre,
+                                                                             @RequestParam(required = false) String genre2,
+                                                                             @RequestParam(required = false) String genre3,
+                                                                             @RequestParam(required = false) String genre4,
+                                                                             @RequestParam(required = false) String genre5,
+                                                                             @RequestParam(required = false) String genre6,
+                                                                             @RequestParam(required = false) String genre7) {
+
+        FilterRequest filterRequest = FilterRequest.builder()
+                .genre(genre)
+                .genre2(genre2)
+                .genre3(genre3)
+                .genre4(genre4)
+                .genre5(genre5)
+                .genre6(genre6)
+                .genre7(genre7)
+                .build();
+
+        return bookService.filterBooksByGenreAndRating(filterRequest);
     }
 }

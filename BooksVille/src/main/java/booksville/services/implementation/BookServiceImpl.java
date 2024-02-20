@@ -7,6 +7,7 @@ import booksville.entities.model.UserEntity;
 import booksville.infrastructure.exceptions.ApplicationException;
 import booksville.infrastructure.security.JWTGenerator;
 import booksville.payload.request.BookEntityRequest;
+import booksville.payload.request.FilterRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.BookEntityResponse;
 import booksville.payload.response.BookResponsePage;
@@ -20,6 +21,7 @@ import booksville.utils.FileUtils;
 import booksville.utils.HelperClass;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -27,12 +29,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Book;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -171,13 +175,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<String>> hideBook(Long bookId) {
+    public ResponseEntity<ApiResponse<String>> toggleHideBook(Long bookId) {
         Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookId);
         if(optionalBookEntity.isEmpty()){
             throw new ApplicationException("Book with id " +bookId+ " does not exist");
         }
         BookEntity existingBook = optionalBookEntity.get();
-        existingBook.setHidden(true);
+        existingBook.setHidden(!existingBook.getHidden());
         bookRepository.save(existingBook);
 
         return ResponseEntity.ok(new ApiResponse<>("Book with id " + bookId + " is now hidden"));
@@ -391,6 +395,84 @@ public class BookServiceImpl implements BookService {
                 new ApiResponse<>(
                         "success",
                         bookResponsePage
+                )
+        );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> filterBooksByGenreAndRating(FilterRequest filterRequest) {
+        List<BookEntity> bookEntities = bookRepository.findBookEntitiesByGenreOrGenreOrGenreOrGenreOrGenreOrGenreOrGenre(
+                filterRequest.getGenre(),
+                filterRequest.getGenre2(),
+                filterRequest.getGenre3(),
+                filterRequest.getGenre4(),
+                filterRequest.getGenre5(),
+                filterRequest.getGenre6(),
+                filterRequest.getGenre7()
+        );
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(
+                        bookEntity -> modelMapper.map(bookEntity, BookEntityResponse.class)
+                ).toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookEntityResponses
+                )
+        );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<BookResponsePage>> filterByRating(int pageNo, int pageSize, String sortBy, String sortDir, int rating) {
+        // Sort condition
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<BookEntity> bookEntitiesPage = bookRepository.findBookEntitiesByRating(rating, pageable);
+
+        List<BookEntity> bookEntities = bookEntitiesPage.getContent();
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(bookEntity -> modelMapper
+                        .map(bookEntity, BookEntityResponse.class)
+                ).toList();
+
+        BookResponsePage bookResponsePage = BookResponsePage.builder()
+                .content(bookEntityResponses)
+                .pageNo(bookEntitiesPage.getNumber())
+                .pageSize(bookEntitiesPage.getSize())
+                .totalElements(bookEntitiesPage.getTotalElements())
+                .totalPages(bookEntitiesPage.getTotalPages())
+                .last(bookEntitiesPage.isLast())
+                .build();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookResponsePage
+                )
+        );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> findAllBooks() {
+        List<BookEntity> bookEntities = bookRepository.findAll();
+
+        List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
+                .map(bookEntity -> modelMapper.map(bookEntity, BookEntityResponse.class))
+                .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookEntityResponses
                 )
         );
     }

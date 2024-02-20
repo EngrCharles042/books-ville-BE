@@ -8,7 +8,7 @@ import booksville.infrastructure.security.JWTGenerator;
 import booksville.payload.request.payment.FlutterWaveRequest;
 import booksville.payload.request.payment.PayStackRequest;
 import booksville.payload.response.ApiResponse;
-import booksville.repositories.BookEntityRepository;
+import booksville.repositories.BookRepository;
 import booksville.repositories.TransactionEntityRepository;
 import booksville.repositories.UserEntityRepository;
 import booksville.services.TransactionService;
@@ -27,7 +27,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final HelperClass helperClass;
     private final HttpServletRequest httpServletRequest;
     private final JWTGenerator jwtGenerator;
-    private final BookEntityRepository bookEntityRepository;
+    private final BookRepository bookEntityRepository;
 
     @Override
     public ResponseEntity<ApiResponse<String>> PayStackPayment(PayStackRequest payStackRequest, Long bookId) {
