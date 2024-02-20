@@ -106,6 +106,12 @@ public class BookController {
         return bookService.getPurchasedBooks(pageNo, pageSize, sortBy, sortDir);
     }
 
+    @GetMapping("/purchased/user")
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> getAllPurchasedBooksByUser() {
+
+        return bookService.getPurchasedBooksByUser();
+    }
+
     @GetMapping("/admin-search")
     public ResponseEntity<ApiResponse<BookResponsePage>> searchUsingAuthorOrTitleOrGenre(
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,

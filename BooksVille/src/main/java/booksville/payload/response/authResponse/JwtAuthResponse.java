@@ -15,6 +15,7 @@ public class JwtAuthResponse {
     String profilePicture;
     String email;
     String phoneNumber;
+    String subscription;
     Roles role;
     String accessToken;
     String refreshToken;
