@@ -1,0 +1,19 @@
+#global.scrape_internal=10s
+#global.evaluation_internal=10s
+#
+#scrape_configs[0].job_name=book-ville-app
+#scrape_configs[0].metrics_path=api/v1/actuator/prometheus
+#scrape_configs[0].static_configs[0].targets[0]=host.docker.internal:8080
+
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: book-ville-app
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - host.docker.internal:8080
+
+

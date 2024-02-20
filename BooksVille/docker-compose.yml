@@ -1,0 +1,32 @@
+#version=3
+#services.prometheus.container_name=prometheus
+#services.prometheus.image=prom/prometheus
+#services.prometheus.restart=always
+#services.prometheus.extra_hosts[0]=host.docker.internal:host-gateway
+#services.prometheus.command[0]=--config.file=/etc/prometheus.yml
+#grafana.container_name=grafana
+#grafana.image=grafana/grafana
+#grafana.ports[0]=3000:3000
+#
+#services.prometheus.volumes[0]=./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+#services.prometheus.ports[0]=9090:9090
+
+version: '3'
+services:
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    restart: always
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    command:
+      - "--config.file=/etc/prometheus.yml"
+    volumes:
+      - "./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
