@@ -1,6 +1,9 @@
 package booksville.payload.request.payment;
 
+import booksville.payload.response.BookEntityResponse;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,4 +23,5 @@ public class FlutterWaveRequest {
     private String status;
     private String transaction_id;
     private String tx_ref;
+    private List<BookEntityResponse> books;
 }

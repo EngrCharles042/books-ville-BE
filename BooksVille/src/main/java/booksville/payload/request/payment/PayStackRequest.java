@@ -1,6 +1,9 @@
 package booksville.payload.request.payment;
 
+import booksville.payload.response.BookEntityResponse;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +18,5 @@ public class PayStackRequest {
     private String trans;
     private String transaction;
     private String trxref;
+    private List<BookEntityResponse> books;
 }
