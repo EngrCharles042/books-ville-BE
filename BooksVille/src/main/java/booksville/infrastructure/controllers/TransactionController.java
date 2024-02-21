@@ -35,12 +35,12 @@ public class TransactionController {
     @PostMapping("/paystack")
     public ResponseEntity<ApiResponse<String>> payStackCart(@RequestBody PayStackRequest payStackRequest) {
 
-        return ResponseEntity.ok(new ApiResponse<>("success"));
+        return transactionService.PayStackPaymentCart(payStackRequest);
     }
 
     @PostMapping("/flutter")
     public ResponseEntity<ApiResponse<String>> flutterCart(@RequestBody FlutterWaveRequest flutterWaveRequest) {
 
-        return ResponseEntity.ok(new ApiResponse<>("success"));
+        return transactionService.FlutterPaymentCart(flutterWaveRequest);
     }
 }
