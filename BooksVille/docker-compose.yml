@@ -20,11 +20,12 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     command:
-      - "--config.file=/etc/prometheus.yml"
+      - --config.file=/etc/prometheus.yml
     volumes:
-      - "./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+
   grafana:
     container_name: grafana
     image: grafana/grafana
