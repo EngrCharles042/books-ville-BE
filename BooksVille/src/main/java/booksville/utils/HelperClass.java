@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -27,6 +28,7 @@ public class HelperClass {
     private final UserEntityRepository userEntityRepository;
     private final HttpServletRequest request;
     private final JWTGenerator jwtGenerator;
+    private final JavaMailSender javaMailSender;
 
     public void sendEmail(
             String firstName,
@@ -41,7 +43,7 @@ public class HelperClass {
             ) {
 
         try {
-            String mailContent ="<div style='padding: 1rem; background-color: #A6F4C5; color: white'>"
+            String mailContent ="<div style='padding: 1rem; background-color: white; color: black'>"
                     + "<p style='text-align: center'>"
                     + "<img src=" + AppConstants.LOGO + " style='width: 8rem'>"
                     + "<p style='font-family: Academy Engraved LET; font-size: 20px; text-align: center'> BOOKSVILLE </p>"
@@ -67,6 +69,11 @@ public class HelperClass {
         } catch (MailException | MessagingException | UnsupportedEncodingException e) {
             throw new ApplicationException(e.getMessage());
         }
+    }
+
+    @Async
+    public void sendEmail(SimpleMailMessage email) {
+        javaMailSender.send(email);
     }
 
     @Async
