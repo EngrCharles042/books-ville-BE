@@ -3,11 +3,14 @@ package booksville.infrastructure.controllers;
 import booksville.payload.request.payment.FlutterWaveRequest;
 import booksville.payload.request.payment.PayStackRequest;
 import booksville.payload.response.ApiResponse;
+import booksville.payload.response.BookEntityResponse;
 import booksville.services.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,5 +30,17 @@ public class TransactionController {
     public ResponseEntity<ApiResponse<String>> flutter(@RequestBody FlutterWaveRequest flutterWaveRequest,
                                           @PathVariable Long bookId) {
         return transactionService.FlutterPayment(flutterWaveRequest, bookId);
+    }
+
+    @PostMapping("/paystack")
+    public ResponseEntity<ApiResponse<String>> payStackCart(@RequestBody PayStackRequest payStackRequest) {
+
+        return ResponseEntity.ok(new ApiResponse<>("success"));
+    }
+
+    @PostMapping("/flutter")
+    public ResponseEntity<ApiResponse<String>> flutterCart(@RequestBody FlutterWaveRequest flutterWaveRequest) {
+
+        return ResponseEntity.ok(new ApiResponse<>("success"));
     }
 }

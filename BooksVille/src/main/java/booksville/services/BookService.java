@@ -27,4 +27,5 @@ public interface BookService {
     ResponseEntity<ApiResponse<List<BookEntityResponse>>> filterBooksByGenreAndRating(FilterRequest filterRequest);
     ResponseEntity<ApiResponse<BookResponsePage>> filterByRating(int pageNo, int pageSize, String sortBy, String sortDir, int rating);
     ResponseEntity<ApiResponse<List<BookEntityResponse>>> findAllBooks();
+    ResponseEntity<ApiResponse<List<BookEntityResponse>>> getPurchasedBooksByUser();
 }

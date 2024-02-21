@@ -52,13 +52,19 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> findById(Long id) {
-         BookEntity bookEntity = bookRepository
+        UserEntity userEntity = helperClass.getUserEntity();
+
+        BookEntity bookEntity = bookRepository
                  .findById(id)
                  .orElseThrow(
                         () -> new ApplicationException("Book not found")
                  );
 
-         BookEntityResponse bookEntityResponse = modelMapper.map(bookEntity, BookEntityResponse.class);
+        BookEntityResponse bookEntityResponse = modelMapper.map(bookEntity, BookEntityResponse.class);
+
+        Optional<TransactionEntity> transactionEntity = transactionEntityRepository.findByUserEntityAndBookEntity(userEntity, bookEntity);
+
+        bookEntityResponse.setIsPurchased(transactionEntity.isPresent());
 
          return ResponseEntity.ok(
                  new ApiResponse<>(
@@ -373,7 +379,8 @@ public class BookServiceImpl implements BookService {
         // Create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<BookEntity> bookEntitiesPage = bookRepository.searchUsingAuthorOrTitleOrGenre(search, pageable);
+        Page<BookEntity> bookEntitiesPage = bookRepository
+                .findBookEntitiesByAuthorContainingIgnoreCaseOrBookTitleContainingIgnoreCaseOrGenreContainsIgnoreCase(search, search, search, pageable);
 
         List<BookEntity> bookEntities = bookEntitiesPage.getContent();
 
@@ -467,6 +474,25 @@ public class BookServiceImpl implements BookService {
 
         List<BookEntityResponse> bookEntityResponses = bookEntities.stream()
                 .map(bookEntity -> modelMapper.map(bookEntity, BookEntityResponse.class))
+                .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        bookEntityResponses
+                )
+        );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> getPurchasedBooksByUser() {
+        UserEntity userEntity = getCurrentUserFromToken();
+
+        List<TransactionEntity> purchasedBooksByUser = transactionEntityRepository.findAllByUserEntity(userEntity);
+
+        List<BookEntityResponse> bookEntityResponses = purchasedBooksByUser.stream()
+                .map(purchasedBook -> modelMapper.map(purchasedBook.getBookEntity(), BookEntityResponse.class))
                 .toList();
 
         return ResponseEntity.ok(

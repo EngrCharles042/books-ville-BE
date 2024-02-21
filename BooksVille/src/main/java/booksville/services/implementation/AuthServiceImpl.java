@@ -1,6 +1,7 @@
 package booksville.services.implementation;
 
 import booksville.entities.enums.Roles;
+import booksville.entities.model.SubscriptionEntity;
 import booksville.entities.model.UserEntity;
 import booksville.infrastructure.events.publisher.EventPublisher;
 import booksville.infrastructure.exceptions.ApplicationException;
@@ -11,6 +12,7 @@ import booksville.payload.request.authRequest.UserSignUpRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.authResponse.JwtAuthResponse;
 import booksville.payload.response.authResponse.UserSignUpResponse;
+import booksville.repositories.SubscriptionEntityRepository;
 import booksville.repositories.UserEntityRepository;
 import booksville.services.AuthService;
 import booksville.utils.SecurityConstants;
@@ -38,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final HttpServletRequest request;
     private final AuthenticationManager authenticationManager;
     private final JWTGenerator jwtGenerator;
+    private final SubscriptionEntityRepository subscriptionEntityRepository;
 
     @Override
     public ResponseEntity<ApiResponse<UserSignUpResponse>> registerUser(UserSignUpRequest userSignUpRequest) {
@@ -185,6 +188,8 @@ public class AuthServiceImpl implements AuthService {
 
         UserEntity userEntity = userEntityOptional.get();
 
+        Optional<SubscriptionEntity> subscription = subscriptionEntityRepository.findByUserEntity(userEntity);
+
         JwtAuthResponse authResponse = JwtAuthResponse.builder()
                 .accessToken(token)
                 .refreshToken(refreshToken)
@@ -195,6 +200,7 @@ public class AuthServiceImpl implements AuthService {
                 .phoneNumber(userEntity.getPhoneNumber())
                 .firstName(userEntity.getFirstName())
                 .lastName(userEntity.getLastName())
+                .subscription(subscription.isPresent() ? subscription.get().getSubscription() : "")
                 .role(userEntity.getRoles())
                 .build();
 
