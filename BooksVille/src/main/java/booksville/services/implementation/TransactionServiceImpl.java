@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +32,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public ResponseEntity<ApiResponse<String>> PayStackPayment(PayStackRequest payStackRequest, Long bookId) {
-        String email = jwtGenerator.getEmailFromJWT(helperClass.getTokenFromHttpRequest(httpServletRequest));
-
-        UserEntity userEntity = userEntityRepository
-                .findByEmail(email)
-                .orElseThrow(
-                        () -> new ApplicationException("User not found")
-                );
+        UserEntity userEntity = helperClass.getUserEntity();
 
         BookEntity bookEntity = bookEntityRepository
                 .findById(bookId)
@@ -67,13 +62,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public ResponseEntity<ApiResponse<String>> FlutterPayment(FlutterWaveRequest flutterWaveRequest, Long bookId) {
-        String email = jwtGenerator.getEmailFromJWT(helperClass.getTokenFromHttpRequest(httpServletRequest));
-
-        UserEntity userEntity = userEntityRepository
-                .findByEmail(email)
-                .orElseThrow(
-                        () -> new ApplicationException("User not found")
-                );
+        UserEntity userEntity = helperClass.getUserEntity();
 
         BookEntity bookEntity = bookEntityRepository
                 .findById(bookId)
@@ -97,6 +86,58 @@ public class TransactionServiceImpl implements TransactionService {
                         new ApiResponse<>(
                                 "success",
                                 savedTransaction.getStatus()
+                        )
+                );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> PayStackPaymentCart(PayStackRequest payStackRequest) {
+        UserEntity userEntity = helperClass.getUserEntity();
+
+        payStackRequest.getBooks().forEach(
+                        bookEntityResponse -> transactionEntityRepository.save(
+                                TransactionEntity.builder()
+                                        .amount(bookEntityResponse.getPrice())
+                                        .status(payStackRequest.getStatus() + "_" + bookEntityResponse.getId())
+                                        .referenceId(payStackRequest.getTrxref())
+                                        .bookEntity(bookEntityRepository.findById(bookEntityResponse.getId()).get())
+                                        .userEntity(userEntity)
+                                        .build()
+                        )
+                );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        new ApiResponse<>(
+                                "success",
+                                "success"
+                        )
+                );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> FlutterPaymentCart(FlutterWaveRequest flutterWaveRequest) {
+        UserEntity userEntity = helperClass.getUserEntity();
+
+        flutterWaveRequest.getBooks().forEach(
+                bookEntityResponse -> transactionEntityRepository.save(
+                        TransactionEntity.builder()
+                                .amount(bookEntityResponse.getPrice())
+                                .status(flutterWaveRequest.getStatus())
+                                .referenceId(flutterWaveRequest.getTx_ref() + "_" + bookEntityResponse.getId())
+                                .bookEntity(bookEntityRepository.findById(bookEntityResponse.getId()).get())
+                                .userEntity(userEntity)
+                                .build()
+                )
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        new ApiResponse<>(
+                                "success",
+                                "completed"
                         )
                 );
     }
