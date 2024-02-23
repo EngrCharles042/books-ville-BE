@@ -1,9 +1,6 @@
 package booksville.services.implementation;
 
-import booksville.entities.model.BookEntity;
-import booksville.entities.model.SavedBooksEntity;
-import booksville.entities.model.TransactionEntity;
-import booksville.entities.model.UserEntity;
+import booksville.entities.model.*;
 import booksville.infrastructure.exceptions.ApplicationException;
 import booksville.infrastructure.security.JWTGenerator;
 import booksville.payload.request.BookEntityRequest;
@@ -11,12 +8,10 @@ import booksville.payload.request.FilterRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.BookEntityResponse;
 import booksville.payload.response.BookResponsePage;
-import booksville.repositories.BookRepository;
-import booksville.repositories.SavedBooksEntityRepository;
-import booksville.repositories.TransactionEntityRepository;
-import booksville.repositories.UserEntityRepository;
+import booksville.repositories.*;
 import booksville.services.BookService;
 import booksville.services.FileUpload;
+import booksville.services.NotificationCacheService;
 import booksville.utils.FileUtils;
 import booksville.utils.HelperClass;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +35,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
+    private final NotificationRepository notificationRepository;
     private final BookRepository bookRepository;
     private final SavedBooksEntityRepository savedBooksEntityRepository;
     private final ModelMapper modelMapper;
@@ -49,6 +45,7 @@ public class BookServiceImpl implements BookService {
     private final HttpServletRequest request;
     private final FileUpload fileUpload;
     private final TransactionEntityRepository transactionEntityRepository;
+    private final NotificationCacheService cacheService;
 
     @Override
     public ResponseEntity<ApiResponse<BookEntityResponse>> findById(Long id) {
@@ -120,6 +117,16 @@ public class BookServiceImpl implements BookService {
                 .build();
 
         BookEntity savedBook = bookRepository.save(bookEntity);
+
+        Notification notification = Notification.builder()
+                .genre(savedBook.getGenre())
+                .message("New Book: "+ savedBook.getBookTitle() + ", with genre - " + savedBook.getGenre() + " have been added to the store")
+                .build();
+        notification.setId(1L);
+
+        Notification savedNotification = notificationRepository.save(notification);
+
+        cacheService.updateCachedData(savedNotification);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

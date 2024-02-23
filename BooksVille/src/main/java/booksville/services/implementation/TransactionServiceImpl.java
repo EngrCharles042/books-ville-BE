@@ -9,6 +9,7 @@ import booksville.payload.request.payment.FlutterWaveRequest;
 import booksville.payload.request.payment.PayStackRequest;
 import booksville.payload.response.ApiResponse;
 import booksville.repositories.BookRepository;
+import booksville.repositories.CartRepository;
 import booksville.repositories.TransactionEntityRepository;
 import booksville.repositories.UserEntityRepository;
 import booksville.services.TransactionService;
@@ -29,6 +30,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final HttpServletRequest httpServletRequest;
     private final JWTGenerator jwtGenerator;
     private final BookRepository bookEntityRepository;
+    private final CartRepository cartRepository;
 
     @Override
     public ResponseEntity<ApiResponse<String>> PayStackPayment(PayStackRequest payStackRequest, Long bookId) {
@@ -107,6 +109,8 @@ public class TransactionServiceImpl implements TransactionService {
                         )
                 );
 
+        cartRepository.deleteAllByUserEntity(userEntity);
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         new ApiResponse<>(
@@ -132,6 +136,8 @@ public class TransactionServiceImpl implements TransactionService {
                                 .build()
                 )
         );
+
+        cartRepository.deleteAllByUserEntity(userEntity);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(

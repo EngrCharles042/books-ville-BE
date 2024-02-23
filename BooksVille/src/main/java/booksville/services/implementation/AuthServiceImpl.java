@@ -61,6 +61,9 @@ public class AuthServiceImpl implements AuthService {
         // Encrypt the password using Bcrypt password encoder
         newUser.setPassword(passwordEncoder.encode(userSignUpRequest.getPassword()));
 
+        // Set Gender Neutral Profile Picture
+        newUser.setProfilePicture("https://res.cloudinary.com/dpfqbb9pl/image/upload/v1708720135/gender_neutral_avatar_ruxcpg.jpg");
+
         // Save the user to the database
         UserEntity savedUser = userEntityRepository.save(newUser);
 
@@ -93,6 +96,9 @@ public class AuthServiceImpl implements AuthService {
 
         // Encrypt the password using Bcrypt password encoder
         newAdmin.setPassword(passwordEncoder.encode(userSignUpRequest.getPassword()));
+
+        // Set Gender Neutral Profile Picture
+        newAdmin.setProfilePicture("https://res.cloudinary.com/dpfqbb9pl/image/upload/v1708720135/gender_neutral_avatar_ruxcpg.jpg");
 
         // Save the user to the database
         UserEntity savedAdmin = userEntityRepository.save(newAdmin);

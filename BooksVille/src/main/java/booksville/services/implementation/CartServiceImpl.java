@@ -2,11 +2,13 @@ package booksville.services.implementation;
 
 import booksville.entities.model.BookEntity;
 import booksville.entities.model.CartEntity;
+import booksville.entities.model.TransactionEntity;
 import booksville.entities.model.UserEntity;
 import booksville.payload.response.ApiResponse;
 import booksville.payload.response.BookEntityResponse;
 import booksville.repositories.BookRepository;
 import booksville.repositories.CartRepository;
+import booksville.repositories.TransactionEntityRepository;
 import booksville.services.CartService;
 import booksville.utils.HelperClass;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
-
+    private final TransactionEntityRepository transactionEntityRepository;
     private final CartRepository cartRepository;
     private final BookRepository bookRepository;
     private final HelperClass helperClass;
@@ -107,5 +109,57 @@ public class CartServiceImpl implements CartService {
                                 bookEntityResponses
                         )
                 );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> checkAlreadyPurchasedBooksInCart() {
+        UserEntity userEntity = helperClass.getUserEntity();
+
+        List<BookEntity> purchasedBooks = transactionEntityRepository
+                .findAllByUserEntity(userEntity)
+                .stream()
+                .map(TransactionEntity::getBookEntity)
+                .toList();
+
+        List<BookEntity> booksInCart = cartRepository
+                .findCartEntitiesByUserEntity(userEntity)
+                .stream()
+                .map(CartEntity::getBookEntity)
+                .toList();
+
+        List<BookEntityResponse> bookEntityResponses = booksInCart.stream()
+                .filter(purchasedBooks::contains)
+                .toList()
+                .stream()
+                .map(bookEntity -> modelMapper.map(bookEntity, BookEntityResponse.class))
+                .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        SUCCESS,
+                        bookEntityResponses
+                )
+        );
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> removeAllAlreadyPurchased(List<Long> ids) {
+        UserEntity userEntity = helperClass.getUserEntity();
+
+        ids.forEach(
+                    id -> cartRepository
+                    .deleteByUserEntityAndBookEntity(
+                            userEntity,
+                            bookRepository.findById(id).get()
+                    )
+                );
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success"
+                )
+        );
     }
 }

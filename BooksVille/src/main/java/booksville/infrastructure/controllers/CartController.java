@@ -23,6 +23,11 @@ public class CartController {
         return cartService.getCart();
     }
 
+    @GetMapping("/already-purchased")
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> checkAlreadyPurchasedBooksInCart() {
+        return cartService.checkAlreadyPurchasedBooksInCart();
+    }
+
     @PostMapping("/addToCart")
     public ResponseEntity<ApiResponse<String>> addToCart(@RequestParam("id") Long id) {
 
@@ -33,5 +38,11 @@ public class CartController {
     public ResponseEntity<ApiResponse<String>> removeFromCart(@PathVariable("id") Long id) {
 
         return cartService.removeFromCart(id);
+    }
+
+    @DeleteMapping("/already-purchased")
+    ResponseEntity<ApiResponse<String>> removeAllAlreadyPurchased(@RequestParam List<Long> ids) {
+
+        return cartService.removeAllAlreadyPurchased(ids);
     }
 }
