@@ -27,18 +27,20 @@ public class NotificationCache implements NotificationCacheService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable("notification")
-    public String getNotificationData(Long id) {
-        return notificationRepository.findById(id).orElseThrow(
+    public NotificationResponse getNotificationData(Long id) {
+        Notification notification = notificationRepository.findById(id).orElseThrow(
                 () -> new ApplicationException("Not found")
-        ).getMessage();
+        );
+
+        return modelMapper.map(notification, NotificationResponse.class);
     }
 
 
     @Override
     @Transactional
     @CachePut(value = "notification", key = "#notification.id")
-    public String updateCachedData(Notification notification) {
+    public NotificationResponse updateCachedData(Notification notification) {
 
-        return notification.getMessage();
+        return modelMapper.map(notification, NotificationResponse.class);
     }
 }

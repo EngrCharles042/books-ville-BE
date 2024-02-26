@@ -9,6 +9,7 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,7 +18,17 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Optional;
 
 @Slf4j
@@ -29,6 +40,12 @@ public class HelperClass {
     private final HttpServletRequest request;
     private final JWTGenerator jwtGenerator;
     private final JavaMailSender javaMailSender;
+
+    @Value("${DECRYPTION_KEY}")
+    private String key;
+
+    @Value("${DECRYPTION_KEY}")
+    private String iv;
 
     public void sendEmail(
             String firstName,
@@ -181,5 +198,21 @@ public class HelperClass {
         return  userEntityRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new ApplicationException("User does not exist with email " + email));
+    }
+
+    public String decryptPassword(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+
+            Base64.Decoder decoder = Base64.getDecoder();
+            byte[] encrypted1 = decoder.decode(data);
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            SecretKeySpec keyspec = new SecretKeySpec(key.getBytes(), "AES");
+            IvParameterSpec ivspec = new IvParameterSpec(iv.getBytes());
+
+            cipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
+
+            byte[] original = cipher.doFinal(encrypted1);
+            String originalString = new String(original);
+            return originalString.trim();
     }
 }

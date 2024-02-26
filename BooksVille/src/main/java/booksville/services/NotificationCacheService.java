@@ -7,6 +7,6 @@ import booksville.payload.response.NotificationResponse;
 import java.util.List;
 
 public interface NotificationCacheService {
-    String getNotificationData(Long id);
-    String updateCachedData(Notification notification);
+    NotificationResponse getNotificationData(Long id);
+    NotificationResponse updateCachedData(Notification notification);
 }

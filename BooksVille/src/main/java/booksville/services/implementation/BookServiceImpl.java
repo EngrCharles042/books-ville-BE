@@ -24,10 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Book;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,6 +108,7 @@ public class BookServiceImpl implements BookService {
                 .bookTitle(bookEntityRequest.getBookTitle())
                 .genre(bookEntityRequest.getGenre())
                 .description(bookEntityRequest.getDescription())
+                .hidden(false)
                 .bookCover(fileUpload.uploadFile(bookEntityRequest.getBookCover()))
                 .bookData(FileUtils.compressImage(bookEntityRequest.getBookFile().getBytes()))
                 .price(bookEntityRequest.getPrice())
@@ -155,14 +153,14 @@ public class BookServiceImpl implements BookService {
         existingBook.setDescription(bookEntityRequest.getDescription());
         existingBook.setPrice(bookEntityRequest.getPrice());
 
-        bookRepository.save(existingBook);
+        BookEntity savedBook = bookRepository.save(existingBook);
 
         BookEntityResponse bookEntityResponse = BookEntityResponse.builder()
-                .id(existingBook.getId())
-                .author(existingBook.getAuthor())
-                .bookTitle(existingBook.getBookTitle())
-                .genre(existingBook.getGenre())
-                .description(existingBook.getDescription())
+                .id(savedBook.getId())
+                .author(savedBook.getAuthor())
+                .bookTitle(savedBook.getBookTitle())
+                .genre(savedBook.getGenre())
+                .description(savedBook.getDescription())
                 .build();
         return ResponseEntity.ok(new ApiResponse<>("edited successfully",bookEntityResponse));
     }
@@ -188,16 +186,21 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<String>> toggleHideBook(Long bookId) {
+    public ResponseEntity<ApiResponse<Boolean>> toggleHideBook(Long bookId) {
         Optional<BookEntity> optionalBookEntity = bookRepository.findBookEntitiesById(bookId);
         if(optionalBookEntity.isEmpty()){
             throw new ApplicationException("Book with id " +bookId+ " does not exist");
         }
         BookEntity existingBook = optionalBookEntity.get();
         existingBook.setHidden(!existingBook.getHidden());
-        bookRepository.save(existingBook);
+        BookEntity savedBook = bookRepository.save(existingBook);
 
-        return ResponseEntity.ok(new ApiResponse<>("Book with id " + bookId + " is now hidden"));
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        savedBook.getHidden()
+                )
+        );
     }
 
     @Override
