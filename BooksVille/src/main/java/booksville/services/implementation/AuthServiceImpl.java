@@ -15,6 +15,7 @@ import booksville.payload.response.authResponse.UserSignUpResponse;
 import booksville.repositories.SubscriptionEntityRepository;
 import booksville.repositories.UserEntityRepository;
 import booksville.services.AuthService;
+import booksville.utils.HelperClass;
 import booksville.utils.SecurityConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -39,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final EventPublisher publisher;
     private final HttpServletRequest request;
     private final AuthenticationManager authenticationManager;
+    private final HelperClass helperClass;
     private final JWTGenerator jwtGenerator;
     private final SubscriptionEntityRepository subscriptionEntityRepository;
 
@@ -60,6 +68,9 @@ public class AuthServiceImpl implements AuthService {
 
         // Encrypt the password using Bcrypt password encoder
         newUser.setPassword(passwordEncoder.encode(userSignUpRequest.getPassword()));
+
+        // Set Gender Neutral Profile Picture
+        newUser.setProfilePicture("https://res.cloudinary.com/dpfqbb9pl/image/upload/v1708720135/gender_neutral_avatar_ruxcpg.jpg");
 
         // Save the user to the database
         UserEntity savedUser = userEntityRepository.save(newUser);
@@ -93,6 +104,9 @@ public class AuthServiceImpl implements AuthService {
 
         // Encrypt the password using Bcrypt password encoder
         newAdmin.setPassword(passwordEncoder.encode(userSignUpRequest.getPassword()));
+
+        // Set Gender Neutral Profile Picture
+        newAdmin.setProfilePicture("https://res.cloudinary.com/dpfqbb9pl/image/upload/v1708720135/gender_neutral_avatar_ruxcpg.jpg");
 
         // Save the user to the database
         UserEntity savedAdmin = userEntityRepository.save(newAdmin);
@@ -150,7 +164,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse<JwtAuthResponse>> login(LoginRequest loginRequest) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findByEmail(loginRequest.getEmail());
 
         if (userEntityOptional.isEmpty()){
@@ -159,11 +173,13 @@ public class AuthServiceImpl implements AuthService {
             );
         }
 
+        String decryptedPassword = helperClass.decryptPassword(loginRequest.getPassword());
+
         // Authentication manager to authenticate user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
-                        loginRequest.getPassword()
+                        decryptedPassword
                 )
         );
 

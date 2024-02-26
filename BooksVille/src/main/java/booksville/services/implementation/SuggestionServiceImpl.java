@@ -56,6 +56,7 @@ public class SuggestionServiceImpl implements SuggestionService {
                 .map(suggestion -> mapper.map(suggestion, SuggestionEntityResponse.class))
                 .collect(Collectors.toList());
 
+
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         "success", mappedSuggestions

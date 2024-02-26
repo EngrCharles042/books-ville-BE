@@ -43,4 +43,10 @@ public class TransactionController {
 
         return transactionService.FlutterPaymentCart(flutterWaveRequest);
     }
+
+    @GetMapping("best-seller")
+    public ResponseEntity<ApiResponse<List<BookEntityResponse>>> getBestSeller() {
+
+        return transactionService.getBestSeller();
+    }
 }
